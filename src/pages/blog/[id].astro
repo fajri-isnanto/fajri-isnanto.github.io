@@ -1,0 +1,41 @@
+---
+import {getCollection, render} from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import BackBtn from "../../components/BackBtn.astro";
+import {Image} from "astro:assets";
+import BackToTop from "../../components/BackToTop.astro";
+
+
+export async function getStaticPaths() {
+    const posts = (await getCollection('posts')).filter((post) => !post.data.draft);
+    return posts.map(post => ({
+        params: {id: post.id},
+        props: {post},
+    }));
+}
+
+const {post} = Astro.props;
+
+const {title, description, publishDate, tags, cover} = post.data;
+
+const {Content} = await render(post);
+---
+<Layout title={title} description={description} imageOg={cover.src.src} scrollSmooth={true} mainClass="mx-auto w-full max-w-5xl px-6 md:px-8">
+    <>
+        <div class="flex justify-center mt-10">
+            <BackBtn/>
+        </div>
+        <div class="flex flex-col gap-6 justify-center items-center">
+            <h1 class="text-3xl font-bold text-center">{title}</h1>
+            <p class="text-sm text-n500 dark:text-primary-light ">
+                {tags.join(', ')}
+            </p>
+        </div>
+        <Image transition:name={`${post.id}-image`} class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700" src={cover.src}
+               alt={cover.alt ?? title}/>
+        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert">
+            <Content/>
+        </article>
+        <BackToTop />
+    </>
+</Layout>

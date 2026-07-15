@@ -1,0 +1,60 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import PostCard from "../../../components/PostCard.astro";
+import Pagination from "../../../components/Pagination.astro";
+
+export async function getStaticPaths() {
+    const POSTS_PER_PAGE = 10;
+    const allPosts = (await getCollection("posts"))
+        .filter((post) => !post.data.draft)
+        .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+    const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+
+    return Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => {
+        const page = index + 2;
+        const start = (page - 1) * POSTS_PER_PAGE;
+
+        return {
+            params: { page: String(page) },
+            props: {
+                posts: allPosts.slice(start, start + POSTS_PER_PAGE),
+                currentPage: page,
+                totalPages,
+            },
+        };
+    });
+}
+
+const { posts, currentPage, totalPages } = Astro.props;
+---
+
+<Layout title={`Fajri Isnanto | Porto | Blog | Page ${currentPage}`} description="A list of my blog posts" scrollSmooth={false}>
+    <>
+        <section class="border-bottom">
+            <div class="mb-4">
+                <h2 class="text-3xl font-bold mb-8">All My Blog Posts</h2>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-8">
+            {posts.map((post) => (
+                <PostCard
+                    id={post.id}
+                    title={post.data.title}
+                    description={post.data.description}
+                    publishDate={post.data.publishDate}
+                    tags={post.data.tags}
+                    cover={post.data.cover}
+                />
+            ))}
+        </section>
+
+        <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            getPageHref={(page) => page === 1 ? "/blog" : `/blog/page/${page}`}
+        />
+    </>
+</Layout>

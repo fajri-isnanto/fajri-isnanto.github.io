@@ -1,0 +1,173 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import BlogArticleCard from "../../components/BlogArticleCard.astro";
+
+const POSTS_PER_PAGE = 10;
+
+const allPosts = (await getCollection("posts"))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+const categories = Array.from(new Set(allPosts.flatMap((post) => post.data.tags)))
+    .sort((a, b) => a.localeCompare(b));
+---
+
+<Layout title="Fajri Isnanto | Porto | Categories" description="Browse blog posts by category" scrollSmooth={false} mainClass="mx-auto w-full max-w-6xl px-6 md:px-8">
+    <>
+        <section class="flex flex-col gap-6">
+            <div>
+                <h1 class="text-3xl font-bold">Categories</h1>
+                <p class="mt-2 text-sm text-n500 dark:text-n200">
+                    Pilih topik untuk melihat artikel yang sesuai.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2" aria-label="Blog categories">
+                <a
+                    href="#all"
+                    data-category-filter="all"
+                    class="category-chip rounded-full bg-primary-light px-3 py-2 text-sm font-semibold text-n700 transition hover:bg-primary-hover-light dark:bg-primary-dark dark:text-dark-theme dark:hover:bg-primary-hover-dark"
+                >
+                    #all
+                </a>
+                {categories.map((category) => (
+                    <a
+                        href={`#${category}`}
+                        data-category-filter={category}
+                        class="category-chip rounded-full bg-white px-3 py-2 text-sm font-semibold text-n700 transition hover:bg-primary-light dark:bg-n700 dark:text-light-theme dark:hover:bg-primary-dark"
+                    >
+                        #{category}
+                    </a>
+                ))}
+            </div>
+        </section>
+
+        <section class="mt-6">
+            <div id="category-posts" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {allPosts.map((post) => (
+                    <article
+                        data-category-card
+                        data-categories={post.data.tags.join("|")}
+                    >
+                        <BlogArticleCard
+                            id={post.id}
+                            title={post.data.title}
+                            description={post.data.description}
+                            publishDate={post.data.publishDate}
+                            tags={post.data.tags}
+                            cover={post.data.cover}
+                        />
+                    </article>
+                ))}
+            </div>
+
+            <p id="category-empty" class="hidden py-12 text-center text-n500 dark:text-n200">
+                Belum ada artikel untuk kategori ini.
+            </p>
+
+            <nav id="category-pagination" class="mt-8 flex flex-wrap justify-center gap-2" aria-label="Category pagination"></nav>
+        </section>
+    </>
+</Layout>
+
+<script is:inline define:vars={{ POSTS_PER_PAGE }}>
+    const cards = Array.from(document.querySelectorAll("[data-category-card]"));
+    const chips = Array.from(document.querySelectorAll("[data-category-filter]"));
+    const pagination = document.getElementById("category-pagination");
+    const emptyState = document.getElementById("category-empty");
+
+    let activeCategory = "all";
+    let currentPage = 1;
+
+    function normalizeCategory(value) {
+        return decodeURIComponent((value || "all").replace(/^#/, "")) || "all";
+    }
+
+    function getFilteredCards() {
+        if (activeCategory === "all") return cards;
+
+        return cards.filter((card) => {
+            const categories = (card.dataset.categories || "").split("|");
+            return categories.includes(activeCategory);
+        });
+    }
+
+    function setActiveChip() {
+        chips.forEach((chip) => {
+            const isActive = chip.dataset.categoryFilter === activeCategory;
+            chip.classList.toggle("bg-primary-light", isActive);
+            chip.classList.toggle("dark:bg-primary-dark", isActive);
+            chip.classList.toggle("bg-white", !isActive);
+            chip.classList.toggle("dark:bg-n700", !isActive);
+        });
+    }
+
+    function renderPagination(totalPages) {
+        if (!pagination) return;
+
+        pagination.innerHTML = "";
+        if (totalPages <= 1) return;
+
+        for (let page = 1; page <= totalPages; page += 1) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = String(page);
+            button.setAttribute("aria-label", `Open page ${page}`);
+            button.className = [
+                "rounded-lg",
+                "px-3",
+                "py-2",
+                "text-sm",
+                "font-semibold",
+                "transition",
+                page === currentPage
+                    ? "bg-primary-light text-n700 dark:bg-primary-dark dark:text-dark-theme"
+                    : "bg-white text-n700 hover:bg-primary-light dark:bg-n700 dark:text-light-theme dark:hover:bg-primary-dark",
+            ].join(" ");
+
+            button.addEventListener("click", () => {
+                currentPage = page;
+                render();
+            });
+
+            pagination.appendChild(button);
+        }
+    }
+
+    function render() {
+        const filteredCards = getFilteredCards();
+        const totalPages = Math.max(Math.ceil(filteredCards.length / POSTS_PER_PAGE), 1);
+
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const start = (currentPage - 1) * POSTS_PER_PAGE;
+        const visibleCards = new Set(filteredCards.slice(start, start + POSTS_PER_PAGE));
+
+        cards.forEach((card) => {
+            card.classList.toggle("hidden", !visibleCards.has(card));
+        });
+
+        emptyState?.classList.toggle("hidden", filteredCards.length > 0);
+        setActiveChip();
+        renderPagination(totalPages);
+    }
+
+    function readHash() {
+        activeCategory = normalizeCategory(window.location.hash);
+        currentPage = 1;
+        render();
+    }
+
+    chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+            activeCategory = chip.dataset.categoryFilter || "all";
+            currentPage = 1;
+            render();
+        });
+    });
+
+    window.addEventListener("hashchange", readHash);
+    document.addEventListener("astro:after-swap", readHash);
+    readHash();
+</script>

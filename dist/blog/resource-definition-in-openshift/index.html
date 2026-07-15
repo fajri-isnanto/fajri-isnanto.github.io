@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"> <head><meta name="msapplication-TileColor" content="#000000"><meta name="viewport" content="width=device-width"><meta charset="UTF-8"><meta name="generator" content="Astro v5.0.9"><meta name="title" content="Resource Definition in OpenShift"><meta name="description" content="Penjelasan dasar tentang resource, object, instance, Custom Resource Definition, dan Custom Resource di OpenShift."><meta name="keywords" content="portfolio, blog, red hat, openshift, linux, devops"><meta name="author" content="Fajri Isnanto"><link rel="sitemap" href="/sitemap-index.xml"><link rel="icon" href="/favicon.png"><link rel="canonical" href="https://fajriisnanto.com/blog/resource-definition-in-openshift/"><!-- Open Graph / Facebook --><meta property="og:title" content="Resource Definition in OpenShift"><meta property="og:description" content="Penjelasan dasar tentang resource, object, instance, Custom Resource Definition, dan Custom Resource di OpenShift."><meta property="og:url" content="https://fajriisnanto.com/blog/resource-definition-in-openshift/"><meta property="og:image" content="/_astro/cover.Cl84onk5.webp"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://fajriisnanto.com/blog/resource-definition-in-openshift/"><meta property="twitter:title" content="Resource Definition in OpenShift"><meta property="twitter:description" content="Penjelasan dasar tentang resource, object, instance, Custom Resource Definition, dan Custom Resource di OpenShift."><meta property="twitter:image" content="/_astro/cover.Cl84onk5.webp"><title>Resource Definition in OpenShift</title><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.BScVxmeO.js"></script><link rel="stylesheet" href="/_astro/_id_.u_mI0N18.css">
+<style>@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style><style>[data-astro-transition-scope="astro-uvd35ied-1"] { view-transition-name: resource-definition-in-openshift-image; }@layer astro { ::view-transition-old(resource-definition-in-openshift-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(resource-definition-in-openshift-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(resource-definition-in-openshift-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(resource-definition-in-openshift-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body class="bg-light-theme dark:bg-dark-theme antialiased text-n700 dark:text-light-theme w-full h-screen flex flex-col"> <nav class="bg-white dark:bg-n700 fixed w-full z-20 top-0 start-0 " id="menu" data-astro-cid-5blmo7yk> <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4" data-astro-cid-5blmo7yk> <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse" data-astro-cid-5blmo7yk> <img src="/logo.png" width="40" height="40" alt="Every Cause Has a Root >> Find It logo" class="h-10 w-10 rounded-full object-cover" data-astro-cid-5blmo7yk> <h3 class="self-center text-sm font-semibold leading-snug text-n700 dark:text-white md:text-base" data-astro-cid-5blmo7yk> Every Cause Has a Root &gt;&gt; Find It </h3> </a> <div class="flex md:order-1 space-x-3 md:space-x-0 rtl:space-x-reverse" data-astro-cid-5blmo7yk> <button id="btn-menu" data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false" data-astro-cid-5blmo7yk> <span class="sr-only" data-astro-cid-5blmo7yk>Open main menu</span> <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14" data-astro-cid-5blmo7yk> <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" data-astro-cid-5blmo7yk></path> </svg> </button> </div> <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-2" id="navbar-sticky" data-astro-cid-5blmo7yk> <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:border-gray-700" data-astro-cid-5blmo7yk> <li data-astro-cid-5blmo7yk> <a href="/" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Home </a> </li><li data-astro-cid-5blmo7yk> <a href="/projects" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Projects </a> </li><li data-astro-cid-5blmo7yk> <a href="/blog" class="block py-2 px-3 rounded md:p-0 active" data-astro-cid-5blmo7yk>Blog </a> </li><li data-astro-cid-5blmo7yk> <a href="/categories" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Categories </a> </li> </ul> </div> </div> </nav>  <script type="module">function t(){const n=document.getElementById("btn-menu"),e=document.getElementById("navbar-sticky");n?.addEventListener("click",function(){e?.classList.toggle("hidden")})}t();document.addEventListener("astro:after-swap",t);</script> <main class="mx-auto w-full max-w-5xl px-6 md:px-8 py-24 flex gap-8 flex-col" role="main" id="top">   <div class="flex justify-center mt-10"> <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  [&_svg]:size-4 [&_svg]:shrink-0 dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 h-10 w-10 text-n700 bg-primary-light dark:bg-primary-dark hover:bg-primary-hover-light dark:hover:bg-primary-hover-dark" onclick="history.back()"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"> <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path> </svg> </button> </div> <div class="flex flex-col gap-6 justify-center items-center"> <h1 class="text-3xl font-bold text-center">Resource Definition in OpenShift</h1> <p class="text-sm text-n500 dark:text-primary-light "> openshift, kubernetes </p> </div> <img src="/_astro/cover.Cl84onk5_2dFTbF.webp" alt="Resource definition in OpenShift diagram" data-astro-transition-scope="astro-uvd35ied-1" width="1432" height="955" loading="lazy" decoding="async" class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700"> <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert"> <p>Dalam OpenShift, ada beberapa istilah yang sering muncul ketika kita membaca manifest YAML, melihat object di cluster, atau melakukan troubleshooting workload. Istilah seperti <strong>resource</strong>, <strong>object</strong>, <strong>instance</strong>, <strong>Custom Resource Definition</strong>, dan <strong>Custom Resource</strong> sering terlihat mirip, tetapi sebenarnya memiliki konteks yang berbeda.</p>
+<p>Artikel ini merangkum perbedaan istilah tersebut agar lebih mudah dipahami saat bekerja dengan Kubernetes atau OpenShift.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#resource">Resource</a></li>
+<li><a href="#object">Object</a></li>
+<li><a href="#instance">Instance</a></li>
+<li><a href="#object-yang-menghasilkan-instance">Object yang Menghasilkan Instance</a></li>
+<li><a href="#object-yang-tidak-menghasilkan-instance">Object yang Tidak Menghasilkan Instance</a></li>
+<li><a href="#custom-resource-definition">Custom Resource Definition</a></li>
+<li><a href="#custom-resource">Custom Resource</a></li>
+<li><a href="#ringkasan">Ringkasan</a></li>
+</ol>
+<hr>
+<h2 id="resource">Resource</h2>
+<p><strong>Resource</strong> adalah jenis API yang dikenali oleh Kubernetes atau OpenShift. Resource dapat dipahami sebagai tipe atau blueprint yang digunakan untuk membuat object di dalam cluster.</p>
+<p>Secara umum, resource terbagi menjadi dua:</p>
+<ul>
+<li><strong>Built-in Resource</strong>, yaitu resource bawaan Kubernetes atau OpenShift.</li>
+<li><strong>Custom Resource</strong>, yaitu resource tambahan yang dibuat melalui mekanisme Custom Resource Definition.</li>
+</ul>
+<p>Contoh built-in resource:</p>
+<ul>
+<li>Pod</li>
+<li>Service</li>
+<li>Deployment</li>
+<li>Ingress</li>
+<li>ConfigMap</li>
+<li>Secret</li>
+</ul>
+<p>Dengan kata lain, resource adalah tipe API yang dapat dipanggil oleh user atau system component untuk membuat dan mengelola object.</p>
+<h2 id="object">Object</h2>
+<p><strong>Object</strong> adalah hasil dari resource definition yang sudah dibuat dan tersimpan di dalam cluster.</p>
+<p>Sebagai contoh, kita memiliki file resource definition bernama <code>nginx-app.yaml</code>. File ini berisi desired state dari object yang ingin dibuat.</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#E5C07B">apiVersion</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">apps/v1</span></span>
+<span class="line"><span style="color:#E5C07B">kind</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">Deployment</span></span>
+<span class="line"><span style="color:#E5C07B">metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx-app</span></span>
+<span class="line"><span style="color:#E5C07B">spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  replicas</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">1</span></span>
+<span class="line"><span style="color:#E5C07B">  selector</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    matchLabels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx-app</span></span>
+<span class="line"><span style="color:#E5C07B">  template</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      labels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">        app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx-app</span></span>
+<span class="line"><span style="color:#E5C07B">    spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      containers</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">        - </span><span style="color:#E5C07B">name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx</span></span>
+<span class="line"><span style="color:#E5C07B">          image</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx:latest</span></span>
+<span class="line"><span style="color:#E5C07B">          ports</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">            - </span><span style="color:#E5C07B">containerPort</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">80</span></span></code></pre>
+<p>Ketika file tersebut diterapkan ke cluster:</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B57EDC">oc</span><span style="color:#98C379"> apply</span><span style="color:#56B6C2"> -f</span><span style="color:#98C379"> nginx-app.yaml</span></span></code></pre>
+<p>OpenShift akan membuat sebuah <strong>Deployment object</strong> dengan nama <code>nginx-app</code>. Dalam contoh ini, tipe API resource yang digunakan adalah <code>Deployment</code>.</p>
+<p>Jadi, object adalah representasi nyata dari resource definition yang sudah disimpan di cluster state.</p>
+<h2 id="instance">Instance</h2>
+<p><strong>Instance</strong> adalah entitas yang benar-benar berjalan di dalam cluster. Contoh yang paling umum adalah Pod.</p>
+<p>Object dan instance tidak selalu sama. Sebuah object bisa tetap ada di cluster meskipun tidak menghasilkan instance yang sedang running. Sebaliknya, instance hanya ada ketika workload benar-benar dijalankan oleh cluster.</p>
+<p>Untuk memperjelas perbedaannya, kita bisa membandingkan dua Deployment berikut.</p>
+<h2 id="object-yang-menghasilkan-instance">Object yang Menghasilkan Instance</h2>
+<p>Contoh pertama adalah Deployment dengan nilai parameter <code>replicas: 1</code></p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#E5C07B">apiVersion</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">apps/v1</span></span>
+<span class="line"><span style="color:#E5C07B">kind</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">Deployment</span></span>
+<span class="line"><span style="color:#E5C07B">metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">frontend-app</span></span>
+<span class="line"><span style="color:#E5C07B">spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  replicas</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">1</span></span>
+<span class="line"><span style="color:#E5C07B">  selector</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    matchLabels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">frontend-app</span></span>
+<span class="line"><span style="color:#E5C07B">  template</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      labels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">        app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">frontend-app</span></span>
+<span class="line"><span style="color:#E5C07B">    spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      containers</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">        - </span><span style="color:#E5C07B">name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx</span></span>
+<span class="line"><span style="color:#E5C07B">          image</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx:latest</span></span>
+<span class="line"><span style="color:#E5C07B">          ports</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">            - </span><span style="color:#E5C07B">containerPort</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">80</span></span></code></pre>
+<p>Jika manifest ini diterapkan ke cluster, OpenShift akan membuat object dengan nama <code>frontend-app</code> dengan tipe resource <code>Deployment</code>. Karena nilai <code>replicas</code> adalah <code>1</code>, Deployment tersebut akan menghasilkan satu instance berupa Pod yang running didalam cluster.</p>
+<h2 id="object-yang-tidak-menghasilkan-instance">Object yang Tidak Menghasilkan Instance</h2>
+<p>Contoh kedua adalah Deployment dengan nilai <code>replicas: 0</code>.</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#E5C07B">apiVersion</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">apps/v1</span></span>
+<span class="line"><span style="color:#E5C07B">kind</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">Deployment</span></span>
+<span class="line"><span style="color:#E5C07B">metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">backend-app</span></span>
+<span class="line"><span style="color:#E5C07B">spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  replicas</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">0</span></span>
+<span class="line"><span style="color:#E5C07B">  selector</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    matchLabels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">backend-app</span></span>
+<span class="line"><span style="color:#E5C07B">  template</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">    metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      labels</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">        app</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">backend-app</span></span>
+<span class="line"><span style="color:#E5C07B">    spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">      containers</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">        - </span><span style="color:#E5C07B">name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx</span></span>
+<span class="line"><span style="color:#E5C07B">          image</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx:latest</span></span>
+<span class="line"><span style="color:#E5C07B">          ports</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#A9B2C3">            - </span><span style="color:#E5C07B">containerPort</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">80</span></span></code></pre>
+<p>Jika manifest ini diterapkan ke cluster, OpenShift tetap akan membuat object baru dengan nama <code>backend-app</code> dengan tipe resource nya adalah <code>Deployment</code>. Namun, karena nilai <code>replicas</code> adalah <code>0</code>, object tersebut tidak akan menghasilkan Pod yang running.</p>
+<p>Perbedaannya ada pada parameter <code>replicas</code>:</p>
+<ol>
+<li>Object <code>frontend-app</code> menggunakan <code>replicas: 1</code>, sehingga menghasilkan satu Pod running.</li>
+<li>Object <code>backend-app</code> menggunakan <code>replicas: 0</code>, sehingga tidak menghasilkan Pod running.</li>
+</ol>
+<p>Dari dua contoh tersebut, kita bisa melihat bahwa object dapat tetap exist didalam cluster state meskipun tidak sedang menjalankan instance.</p>
+<h2 id="custom-resource-definition">Custom Resource Definition</h2>
+<p><strong>Custom Resource Definition</strong> atau <strong>CRD</strong> adalah mekanisme untuk memperluas Kubernetes API dengan menambahkan jenis resource baru yang dikenali oleh cluster serta dapat digunakan layaknya resource built-in dengan mendefinisikanya di parameter ‘Kind’ pada sebuah file Manifest (Resource Definition File)</p>
+<p>Setelah CRD dibuat, user dapat membuat object dari resource tersebut melalui <strong>Custom Resource</strong> atau <strong>CR</strong>. Polanya mirip seperti ketika membuat object dari resource bawaan Kubernetes (built-in), seperti Pod, Service, atau Deployment.</p>
+<p>Tujuan utama CRD adalah menambahkan kapabilitas baru ke dalam cluster tanpa perlu mengubah resource bawaan Kubernetes. Dengan CRD, Kubernetes atau OpenShift dapat diadaptasi untuk kebutuhan aplikasi, operator, atau platform tertentu.</p>
+<h2 id="custom-resource">Custom Resource</h2>
+<p><strong>Custom Resource</strong> atau <strong>CR</strong> adalah object yang dibuat berdasarkan CRD yang sudah tersedia di cluster.</p>
+<p>Untuk membuat object baru dari sebuah CRD, kita memanggil custom <code>kind</code> tersebut di dalam manifest YAML. Struktur <code>spec</code> akan mengikuti definisi yang sudah ditentukan oleh CRD.</p>
+<p>Contoh sederhana:</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#E5C07B">apiVersion</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">example.com/v1</span></span>
+<span class="line"><span style="color:#E5C07B">kind</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">ExampleApp</span></span>
+<span class="line"><span style="color:#E5C07B">metadata</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  name</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">my-example-app</span></span>
+<span class="line"><span style="color:#E5C07B">spec</span><span style="color:#A9B2C3">:</span></span>
+<span class="line"><span style="color:#E5C07B">  replicas</span><span style="color:#A9B2C3">: </span><span style="color:#56B6C2">2</span></span>
+<span class="line"><span style="color:#E5C07B">  image</span><span style="color:#A9B2C3">: </span><span style="color:#98C379">nginx:latest</span></span></code></pre>
+<p>Pada contoh tersebut, <code>ExampleApp</code> adalah custom kind yang hanya bisa dikenali cluster jika CRD untuk <code>ExampleApp</code> sudah terdaftar ke dalam cluster sebelumnya.</p>
+<h2 id="ringkasan">Ringkasan</h2>
+<p>Berikut ringkasan perbedaan istilah yang sering muncul:</p>
+<ul>
+<li><strong>Resource</strong> adalah tipe API atau blueprint yang dikenali cluster.</li>
+<li><strong>Object</strong> adalah hasil dari pembuatan resource di cluster.</li>
+<li><strong>Instance</strong> adalah entitas yang benar-benar running, misalnya Pod.</li>
+<li><strong>CRD</strong> adalah mekanisme untuk menambahkan jenis resource baru ke Kubernetes atau OpenShift API.</li>
+<li><strong>CR</strong> adalah object yang dibuat berdasarkan CRD.</li>
+</ul>
+<p>Pemahaman istilah ini penting karena banyak konsep OpenShift dibangun di atas relasi antara resource, object, dan instance. Saat melakukan troubleshooting, membedakan ketiganya akan membantu kita memahami apakah masalah terjadi pada definisi resource, object yang tersimpan di cluster, atau instance yang sedang berjalan.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/">Kubernetes Documentation: Custom Resources</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/extension_apis/customresourcedefinition-apiextensions-k8s-io-v1">Red Hat OpenShift Documentation: CustomResourceDefinition API</a></li>
+</ul> </article> <div class="flex justify-center mt-10"> <button id="back-to-top" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium [&_svg]:size-4 [&_svg]:shrink-0"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"> <path d="M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z"></path> </svg> <span>Back to Top</span> </button> </div> <script>
+    /** Scrolls the document to the top when
+     * the "Back to Top" button is clicked. */
+    function backToTop() {
+        document.querySelector("#back-to-top")?.addEventListener("click", () => {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        });
+    }
+
+    backToTop();
+</script>   </main> <footer class="container py-4 text-center"> <p>Knowledge must be free.</p> </footer> </body></html>

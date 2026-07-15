@@ -1,0 +1,52 @@
+---
+// component imports
+import {Icon} from "astro-icon/components";
+
+interface SkillCardProps {
+    icon: string | string[];
+    name: string;
+    description: string;
+    showDescription?: boolean;
+}
+
+const {
+    icon,
+    name,
+    description,
+    showDescription = true,
+} = Astro.props as SkillCardProps;
+
+const icons = Array.isArray(icon) ? icon : [icon];
+const isImageIcon = (iconName: string) => iconName.startsWith("/") || /\.(png|jpe?g|webp|svg)$/i.test(iconName);
+
+---
+
+<div class="flex flex-col gap-2 h-skill-icon bg-white dark:bg-n700 p-4 rounded-md">
+    <div class="flex min-h-16 w-fit min-w-16 flex-wrap items-center justify-center gap-2 rounded-md bg-light-theme px-3 py-2 text-n700 dark:bg-dark-theme dark:text-n200">
+        {icons.map((iconName) => (
+            isImageIcon(iconName) ? (
+                <img
+                    src={iconName}
+                    alt={`${name} logo`}
+                    class:list={[
+                        "skill-logo object-contain",
+                        icons.length > 1 ? "h-9 w-9" : "h-12 w-12",
+                    ]}
+                    loading="lazy"
+                />
+            ) : (
+                <Icon width={icons.length > 1 ? 36 : 48} height={icons.length > 1 ? 36 : 48} name={iconName} class="skill-icon" />
+            )
+        ))}
+    </div>
+    <h3 class="text-lg font-bold">{name}</h3>
+    {
+        showDescription && <p class="text-n700 dark:text-n200">{description}</p>
+    }
+</div>
+
+<style>
+    :global(.skill-icon) {
+        display: block;
+    }
+</style>

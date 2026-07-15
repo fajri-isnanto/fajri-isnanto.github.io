@@ -1,0 +1,55 @@
+---
+interface Props {
+    currentPage: number;
+    totalPages: number;
+    getPageHref: (page: number) => string;
+}
+
+const { currentPage, totalPages, getPageHref } = Astro.props as Props;
+const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+---
+
+{totalPages > 1 && (
+    <nav class="flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+        <a
+            href={getPageHref(Math.max(currentPage - 1, 1))}
+            class:list={[
+                "rounded-lg px-3 py-2 text-sm font-medium transition",
+                currentPage === 1
+                    ? "pointer-events-none text-n500"
+                    : "bg-white text-n700 hover:bg-primary-light dark:bg-n700 dark:text-light-theme dark:hover:bg-primary-dark",
+            ]}
+            aria-disabled={currentPage === 1}
+        >
+            Previous
+        </a>
+
+        {pages.map((page) => (
+            <a
+                href={getPageHref(page)}
+                aria-current={page === currentPage ? "page" : undefined}
+                class:list={[
+                    "rounded-lg px-3 py-2 text-sm font-semibold transition",
+                    page === currentPage
+                        ? "bg-primary-light text-n700 dark:bg-primary-dark dark:text-dark-theme"
+                        : "bg-white text-n700 hover:bg-primary-light dark:bg-n700 dark:text-light-theme dark:hover:bg-primary-dark",
+                ]}
+            >
+                {page}
+            </a>
+        ))}
+
+        <a
+            href={getPageHref(Math.min(currentPage + 1, totalPages))}
+            class:list={[
+                "rounded-lg px-3 py-2 text-sm font-medium transition",
+                currentPage === totalPages
+                    ? "pointer-events-none text-n500"
+                    : "bg-white text-n700 hover:bg-primary-light dark:bg-n700 dark:text-light-theme dark:hover:bg-primary-dark",
+            ]}
+            aria-disabled={currentPage === totalPages}
+        >
+            Next
+        </a>
+    </nav>
+)}

@@ -1,0 +1,19 @@
+---
+import PagefindSearch from "astro-pagefind/components/Search.astro";
+---
+
+<div class="my-8 max-w-3xl mx-auto">
+  <PagefindSearch 
+    instance="blog-search"
+    searchboxOptions={{
+      placeholder: "🔍 Cari tutorial, artikel, atau topik...",
+      showSubResults: true,
+    }}
+  />
+</div>
+
+<style>
+  .pagefind-ui {
+    width: 100%;
+  }
+</style>

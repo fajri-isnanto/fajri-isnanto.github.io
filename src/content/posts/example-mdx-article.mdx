@@ -1,0 +1,141 @@
+---
+author: Fajri Isnanto
+draft: true
+draftReason: Example/reference article, hide before production.
+publishDate: 2026-05-28
+title: Example MDX Article with Custom Components
+tags:
+  - mdx
+  - template
+  - components
+description:
+  A complete MDX article example showing how Markdown can be extended with local JSX components for richer static technical content.
+cover:
+  src: './images/example-mdx-article/cover.webp'
+  alt: MDX article example cover
+---
+
+export const Callout = ({ type = "info", title, children }) => {
+  const styles = {
+    info: "border-blue-300 bg-blue-50 text-blue-950",
+    warning: "border-yellow-300 bg-yellow-50 text-yellow-950",
+    success: "border-green-300 bg-green-50 text-green-950",
+  };
+
+  return (
+    <aside className={`my-6 rounded-md border p-4 ${styles[type] ?? styles.info}`}>
+      <strong className="block text-sm uppercase tracking-wide">{title}</strong>
+      <div className="mt-2">{children}</div>
+    </aside>
+  );
+};
+
+export const CommandCard = ({ title, command, note }) => (
+  <section className="my-6 rounded-md border border-neutral-200 bg-neutral-950 p-4 text-neutral-50">
+    <h3 className="mt-0 text-base font-semibold text-white">{title}</h3>
+    <pre className="overflow-x-auto rounded bg-black/40 p-3"><code>{command}</code></pre>
+    {note && <p className="mb-0 text-sm text-neutral-300">{note}</p>}
+  </section>
+);
+
+export const CompareGrid = ({ leftTitle, rightTitle, leftItems, rightItems }) => (
+  <div className="my-6 grid gap-4 md:grid-cols-2">
+    <div className="rounded-md border border-neutral-200 p-4">
+      <h3 className="mt-0 text-base font-semibold">{leftTitle}</h3>
+      <ul>
+        {leftItems.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+    <div className="rounded-md border border-neutral-200 p-4">
+      <h3 className="mt-0 text-base font-semibold">{rightTitle}</h3>
+      <ul>
+        {rightItems.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+  </div>
+);
+
+![Opening image for MDX article](./images/example-mdx-article/cover.webp)
+
+Artikel ini adalah contoh maksimal untuk format `.mdx`. MDX tetap bisa memakai Markdown biasa, tetapi juga bisa menyisipkan komponen JSX langsung di dalam artikel.
+
+Format ini cocok jika artikel membutuhkan tampilan khusus seperti callout box, kartu command, comparison grid, badge, tabs, atau komponen dokumentasi lain yang tidak cukup nyaman dibuat dengan Markdown standar.
+
+<Callout type="info" title="When to Use MDX">
+  Gunakan MDX hanya ketika artikel membutuhkan komponen custom. Jika isi artikel hanya teks, gambar, list, dan code block, format `.md` biasanya lebih sederhana.
+</Callout>
+
+## Standard Markdown Still Works
+
+Kamu tetap bisa menulis paragraf biasa, heading, gambar, bullet list, numbered list, tabel, dan code block seperti file Markdown normal.
+
+![Content explanation image](./images/example-mdx-article/explanation.webp)
+
+## Custom Command Card
+
+<CommandCard
+  title="Check OpenShift Nodes"
+  command={`oc get nodes
+oc adm top nodes
+oc get co`}
+  note="Contoh ini memakai komponen custom agar command penting terlihat seperti kartu khusus."
+/>
+
+## Code Block Example
+
+```bash
+oc get pods -A
+oc describe node worker-01
+oc get events -A --sort-by=.lastTimestamp
+```
+
+## Comparison Component
+
+<CompareGrid
+  leftTitle="Markdown"
+  rightTitle="MDX"
+  leftItems={[
+    "Lebih sederhana",
+    "Cocok untuk artikel teknis standar",
+    "Risiko error lebih kecil",
+  ]}
+  rightItems={[
+    "Bisa memakai komponen custom",
+    "Cocok untuk artikel interaktif atau kaya visual",
+    "Lebih fleksibel tetapi lebih kompleks",
+  ]}
+/>
+
+## Table Example
+
+| Format | Best For | Complexity |
+| --- | --- | --- |
+| `.md` | Artikel teknis standar | Low |
+| `.mdx` | Artikel dengan komponen custom | Medium |
+
+## Bullet List Example
+
+- MDX bisa memakai seluruh fitur Markdown.
+- MDX bisa menyisipkan JSX component.
+- MDX cocok untuk dokumentasi yang butuh tampilan lebih kaya.
+- MDX sebaiknya tidak dipakai jika artikel masih sederhana.
+
+## Numbered List Example
+
+1. Tulis frontmatter seperti biasa.
+2. Tambahkan komponen jika memang dibutuhkan.
+3. Gunakan Markdown standar untuk mayoritas isi.
+4. Jalankan build untuk memastikan JSX valid.
+5. Pakai MDX hanya untuk artikel yang benar-benar perlu.
+
+<Callout type="warning" title="Important">
+  MDX lebih fleksibel, tetapi typo kecil di JSX bisa membuat build gagal. Karena itu, gunakan MDX secara selektif.
+</Callout>
+
+<Callout type="success" title="Recommendation">
+  Untuk blog kamu, gunakan `.md` sebagai default. Gunakan `.mdx` hanya untuk artikel khusus yang membutuhkan komponen visual tambahan.
+</Callout>
+
+## Closing
+
+MDX adalah pilihan kuat untuk artikel yang ingin tampil lebih kaya. Namun untuk daily writing, Markdown tetap lebih cepat dan stabil. Kombinasi terbaik adalah memakai `.md` sebagai default dan `.mdx` sebagai opsi khusus.

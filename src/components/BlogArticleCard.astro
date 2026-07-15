@@ -1,0 +1,46 @@
+---
+import { Image } from "astro:assets";
+import ClockIcon from "@/icons/time-line.svg";
+
+interface Props {
+    id: string;
+    title: string;
+    description: string;
+    publishDate: Date;
+    tags: string[];
+    cover: {
+        src: ImageMetadata;
+        alt?: string;
+    };
+}
+
+const { id, title, description, publishDate, tags, cover } = Astro.props as Props;
+---
+
+<a href={`/blog/${id}`} class="group flex h-full flex-col overflow-hidden rounded bg-white transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-n700" aria-label={`Read post about ${title}`}>
+    <div class="aspect-video overflow-hidden">
+        <Image
+            transition:name={`${id}-image`}
+            src={cover.src}
+            alt={cover.alt ?? title}
+            class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+        />
+    </div>
+    <div class="flex flex-1 flex-col gap-3 p-4">
+        <div class="flex items-center gap-2 text-xs text-n500 dark:text-n200">
+            <ClockIcon class="h-4 w-4" />
+            <time datetime={publishDate.toISOString()}>
+                {publishDate.toDateString()}
+            </time>
+        </div>
+        <h3 class="text-lg font-bold leading-snug text-n700 dark:text-white">{title}</h3>
+        <p class="line-clamp-3 text-sm text-n500 dark:text-n200">{description}</p>
+        <div class="mt-auto flex flex-wrap gap-2 pt-2">
+            {tags.map((tag) => (
+                <span class="rounded-full bg-light-theme px-2.5 py-1 text-xs font-medium text-n500 dark:bg-dark-theme dark:text-primary-dark">
+                    #{tag}
+                </span>
+            ))}
+        </div>
+    </div>
+</a>
