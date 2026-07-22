@@ -38,7 +38,7 @@ Berikut adalah step untuk untuk install dan setup untuk kebutuhan kali ini.
 ## Install
 
 Sebelum menginstall paket haproxy pastikan server sudah bisa akses internet karena saya menggunakan online repository bawaan.
-ssh ke server dan eksekusi command berikut untuk mulai menginstall paket sekaligus ***enable*** service agar autostart saat server booting.
+ssh ke server dan eksekusi command berikut untuk mulai menginstall paket sekaligus **enable** service agar autostart saat server booting.
 ```yaml
 apt install haproxy -y
 systemctl enable haproxy
