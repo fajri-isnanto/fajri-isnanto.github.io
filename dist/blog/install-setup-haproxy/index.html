@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"> <head><meta name="msapplication-TileColor" content="#000000"><meta name="viewport" content="width=device-width"><meta charset="UTF-8"><meta name="generator" content="Astro v5.0.9"><meta name="title" content="Install dan Setup HAproxy on Ubuntu 24.04"><meta name="description" content="Running step untuk install dan setup haproxy sebagi load balancer untuk kebutuhan lb control-plane cluster kubernetes."><meta name="keywords" content="portfolio, blog, red hat, openshift, linux, devops"><meta name="author" content="Fajri Isnanto"><link rel="sitemap" href="/sitemap-index.xml"><link rel="icon" href="/favicon.png"><link rel="canonical" href="https://fajri-isnanto.github.io/blog/install-setup-haproxy/"><!-- Open Graph / Facebook --><meta property="og:title" content="Install dan Setup HAproxy on Ubuntu 24.04"><meta property="og:description" content="Running step untuk install dan setup haproxy sebagi load balancer untuk kebutuhan lb control-plane cluster kubernetes."><meta property="og:url" content="https://fajri-isnanto.github.io/blog/install-setup-haproxy/"><meta property="og:image" content="/_astro/cover.ry24Z16b.png"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://fajri-isnanto.github.io/blog/install-setup-haproxy/"><meta property="twitter:title" content="Install dan Setup HAproxy on Ubuntu 24.04"><meta property="twitter:description" content="Running step untuk install dan setup haproxy sebagi load balancer untuk kebutuhan lb control-plane cluster kubernetes."><meta property="twitter:image" content="/_astro/cover.ry24Z16b.png"><title>Install dan Setup HAproxy on Ubuntu 24.04</title><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.BScVxmeO.js"></script><link rel="stylesheet" href="/_astro/_id_.u_mI0N18.css">
+<style>@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style><style>[data-astro-transition-scope="astro-uvd35ied-1"] { view-transition-name: install-setup-haproxy-image; }@layer astro { ::view-transition-old(install-setup-haproxy-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(install-setup-haproxy-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(install-setup-haproxy-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(install-setup-haproxy-image) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-uvd35ied-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-uvd35ied-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body class="bg-light-theme dark:bg-dark-theme antialiased text-n700 dark:text-light-theme w-full h-screen flex flex-col"> <nav class="bg-white dark:bg-n700 fixed w-full z-20 top-0 start-0 " id="menu" data-astro-cid-5blmo7yk> <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4" data-astro-cid-5blmo7yk> <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse" data-astro-cid-5blmo7yk> <img src="/logo.png" width="40" height="40" alt="Every Causes Has a Root logo" class="h-10 w-10 rounded-full object-cover" data-astro-cid-5blmo7yk> <h3 class="self-center text-sm font-semibold leading-snug text-n700 dark:text-white md:text-base" data-astro-cid-5blmo7yk> Every Causes Has a Root </h3> </a> <div class="flex md:order-1 space-x-3 md:space-x-0 rtl:space-x-reverse" data-astro-cid-5blmo7yk> <button id="btn-menu" data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false" data-astro-cid-5blmo7yk> <span class="sr-only" data-astro-cid-5blmo7yk>Open main menu</span> <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14" data-astro-cid-5blmo7yk> <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" data-astro-cid-5blmo7yk></path> </svg> </button> </div> <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-2" id="navbar-sticky" data-astro-cid-5blmo7yk> <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:border-gray-700" data-astro-cid-5blmo7yk> <li data-astro-cid-5blmo7yk> <a href="/" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Home </a> </li><li data-astro-cid-5blmo7yk> <a href="/projects" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Projects </a> </li><li data-astro-cid-5blmo7yk> <a href="/blog" class="block py-2 px-3 rounded md:p-0 active" data-astro-cid-5blmo7yk>Blog </a> </li><li data-astro-cid-5blmo7yk> <a href="/categories" class="block py-2 px-3 rounded md:p-0" data-astro-cid-5blmo7yk>Categories </a> </li> </ul> </div> </div> </nav>  <script type="module">function t(){const n=document.getElementById("btn-menu"),e=document.getElementById("navbar-sticky");n?.addEventListener("click",function(){e?.classList.toggle("hidden")})}t();document.addEventListener("astro:after-swap",t);</script> <main class="mx-auto w-full max-w-5xl px-6 md:px-8 py-24 flex gap-8 flex-col" role="main" id="top">   <div class="flex justify-center mt-10"> <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  [&_svg]:size-4 [&_svg]:shrink-0 dark:ring-offset-neutral-950 dark:focus-visible:ring-neutral-300 h-10 w-10 text-n700 bg-primary-light dark:bg-primary-dark hover:bg-primary-hover-light dark:hover:bg-primary-hover-dark" onclick="history.back()"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"> <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path> </svg> </button> </div> <div class="flex flex-col gap-6 justify-center items-center"> <h1 class="text-3xl font-bold text-center">Install dan Setup HAproxy on Ubuntu 24.04</h1> <p class="text-sm text-n500 dark:text-primary-light "> kubernetes-setup, haproxy </p> </div> <img src="/_astro/cover.ry24Z16b_W0kP.webp" alt="topologi load balancer" data-astro-transition-scope="astro-uvd35ied-1" width="1536" height="1024" loading="lazy" decoding="async" class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700"> <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert"> <p>Dalam merancang mekanisme HA (High Availibility) untuk control-plane cluster kubernetes diperlukan mekanisme load Balancing untuk trafik yang masuk ke node control-plane dan salah satu software yang bisa kita gunakan secara gratis adalah Haproxy. Haproxy adalah software open source yang biasa digunakan sebagai <strong>Load Balancer</strong> dan <strong>reverse proxy</strong>. Namun pada kebutuhan kali ini haproxy ditujukan sebagai load balancer untuk cluster Kubernetes.</p>
+<p>Tujuan dari kegiatan ini adalah melakukan load balancing terhadap traffic yang masuk ke <strong>API cluster Kubernetes</strong> yang berjalan di node Control-Plane atau biasa kita sebut master node, sehingga service API Cluster tetap dapat diakses jika salah satu service API pada salah satu node control-plane mati.</p>
+<p>Berikut adalah step untuk untuk install dan setup untuk kebutuhan kali ini.</p>
+<h2 id="requirement">Requirement :</h2>
+<ul>
+<li>OS Ubuntu server 24.04 LTS</li>
+<li>Memory 4 GB</li>
+<li>CPU 2 GB</li>
+<li>Internet Akses</li>
+</ul>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#requirement">Requirement</a></li>
+<li><a href="#install">Install HAproxy</a></li>
+<li><a href="#object">Config haproxy.cfg</a></li>
+<li><a href="#ringkasan">Ringkasan</a></li>
+</ol>
+<hr>
+<h2 id="install">Install</h2>
+<p>Sebelum menginstall paket haproxy pastikan server sudah bisa akses internet karena saya menggunakan online repository bawaan.
+ssh ke server dan eksekusi command berikut untuk mulai menginstall paket sekaligus <em><strong>enable</strong></em> service agar autostart saat server booting.</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#98C379">apt install haproxy -y</span></span>
+<span class="line"><span style="color:#98C379">systemctl enable haproxy</span></span></code></pre>
+<p>pastikan service sudah dalam status aktif.</p>
+<h2 id="setup-config">Setup Config</h2>
+<p>Backup file /etc/haproxy/haproxy.cfg sebelum kita edit, kemudian buka file haproxy.cfg bisa menggunakan editor vim, nano, atau vi. Edit isi file sesuai dengan konfigurasi berikut.</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#98C379">global</span></span>
+<span class="line"><span style="color:#98C379">        log /dev/log    local0</span></span>
+<span class="line"><span style="color:#98C379">        log /dev/log    local1 notice</span></span>
+<span class="line"><span style="color:#98C379">        chroot /var/lib/haproxy</span></span>
+<span class="line"><span style="color:#98C379">        stats socket /run/haproxy/admin.sock mode 660 level admin</span></span>
+<span class="line"><span style="color:#98C379">        stats timeout 30s</span></span>
+<span class="line"><span style="color:#98C379">        user haproxy</span></span>
+<span class="line"><span style="color:#98C379">        group haproxy</span></span>
+<span class="line"><span style="color:#98C379">        daemon</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#5F6672;font-style:italic">        # Default SSL material locations</span></span>
+<span class="line"><span style="color:#98C379">        ca-base /etc/ssl/certs</span></span>
+<span class="line"><span style="color:#98C379">        crt-base /etc/ssl/private</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#5F6672;font-style:italic">        # See: https://ssl-config.mozilla.org/#server=haproxy&#x26;server-version=2.0.3&#x26;config=intermediate</span></span>
+<span class="line"><span style="color:#98C379">        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384</span></span>
+<span class="line"><span style="color:#98C379">        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256</span></span>
+<span class="line"><span style="color:#98C379">        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">defaults</span></span>
+<span class="line"><span style="color:#98C379">        log     global</span></span>
+<span class="line"><span style="color:#98C379">        mode    tcp</span></span>
+<span class="line"><span style="color:#98C379">        option  httplog</span></span>
+<span class="line"><span style="color:#98C379">        option  dontlognull</span></span>
+<span class="line"><span style="color:#98C379">        timeout connect 5000</span></span>
+<span class="line"><span style="color:#98C379">        timeout client  50000</span></span>
+<span class="line"><span style="color:#98C379">        timeout server  50000</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 400 /etc/haproxy/errors/400.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 403 /etc/haproxy/errors/403.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 408 /etc/haproxy/errors/408.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 500 /etc/haproxy/errors/500.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 502 /etc/haproxy/errors/502.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 503 /etc/haproxy/errors/503.http</span></span>
+<span class="line"><span style="color:#98C379">        errorfile 504 /etc/haproxy/errors/504.http</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">frontend kubernetes-api</span></span>
+<span class="line"><span style="color:#98C379">    bind 192.168.1.126:6443</span></span>
+<span class="line"><span style="color:#98C379">    mode tcp</span></span>
+<span class="line"><span style="color:#98C379">    default_backend kubernetes-control-plane</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">backend kubernetes-control-plane</span></span>
+<span class="line"><span style="color:#98C379">    mode tcp</span></span>
+<span class="line"><span style="color:#98C379">    balance roundrobin</span></span>
+<span class="line"><span style="color:#98C379">    option tcp-check</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    server master1 192.168.1.121:6443 check</span></span>
+<span class="line"><span style="color:#98C379">    server master2 192.168.1.122:6443 check</span></span>
+<span class="line"><span style="color:#98C379">    server master3 192.168.1.123:6443 check</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">listen stats</span></span>
+<span class="line"><span style="color:#98C379">    bind *:8404</span></span>
+<span class="line"><span style="color:#98C379">    mode http</span></span>
+<span class="line"><span style="color:#98C379">    stats enable</span></span>
+<span class="line"><span style="color:#98C379">    stats uri /stats</span></span>
+<span class="line"><span style="color:#98C379">    stats refresh 10s</span></span>
+<span class="line"></span></code></pre>
+<p><strong>Poin penting</strong> karena konfigurasi tersebut adalah gabungan dari konfigurasi default, maka hal yang mungkin berbeda adalah konfigurasi <strong>Global</strong> dan <strong>Defaults</strong>, Pastikan untuk konfigurasi <strong>frontend</strong>, <strong>backend</strong> dan <strong>listen stats</strong> sudah sesuai. Kemudian untuk IP bisa dirubah sesuai pemakaian IP yang akan digunakan pada node control-plane.</p>
+<p>Berikut adalah IP yang saya gunakan untuk Endpoint Frontend dan Service Backend:</p>
+<ul>
+<li>192.168.1.121:6443  (master1) -> Service Backend</li>
+<li>192.168.1.122:6443  (master2) -> Service Backend</li>
+<li>192.168.1.123:6443  (master3) -> Service Backend</li>
+<li>192.168.1.126:6443  (haproxy) -> Endpoint Frontend</li>
+</ul>
+<p>Jika sudah simpan file haproxy.cfg dan restart service haproxy dengan command berikut.</p>
+<pre class="astro-code plastic" style="background-color:#21252B;color:#A9B2C3; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#98C379">systemctl stop haproxy</span></span>
+<span class="line"><span style="color:#98C379">ps -aux | grep haproxy</span><span style="color:#5F6672;font-style:italic"> #pastikan tidak ada proses haproxy yang jalan (daemon process)</span></span>
+<span class="line"><span style="color:#98C379">systemctl start haproxy</span></span></code></pre>
+<p>alasan saya tidak menggunakan command <strong>systemctl restart haproxy</strong> adalah menghindari kejadian duplikat proses dimana proses haproxy tidak mati sepenuhnya (daemon proccess).</p>
+<p>Jika sudah pastikan service dalam status aktif dan Dashboard UI sudah accessible di port 8404.</p>
+<p><img alt="service" width="953" height="213" loading="lazy" decoding="async" src="/_astro/service.SPOYVAmL_1Ukres.webp" ></p>
+<p><img alt="dashboard" width="1555" height="804" loading="lazy" decoding="async" src="/_astro/dashboard.wrQg-_Te_Z1Nb34s.webp" ></p>
+<p>Pada Dashboard UI status master dalam kedaaan mati (merah), ini dikarenakan service api-cluster yang berjalan di node master port 6443 belum bisa diakses. Service tersebut dapat diakses setelah proses Installasi dan Inisiasi Cluster kubernetes selesai.</p>
+<p>berikut gambaran jika service backend (master node) sudah bisa dialiri traffik service api-cluster kubernetes.
+<img alt="dashboardAktif" width="1538" height="763" loading="lazy" decoding="async" src="/_astro/dashboardaktif.ho72SbhX_cKEjz.webp" ></p>
+<h2 id="ringkasan">Ringkasan</h2>
+<p>Berikut adalah ringkasan dari proses konfigurasi HAProxy sebagai load balancer untuk control plane Kubernetes:</p>
+<ul>
+<li><strong>Frontend Endpoint</strong> – Endpoint utama yang menerima seluruh koneksi menuju Kubernetes API Server.</li>
+<li><strong>Backend Service</strong> – Kumpulan node control plane yang menjalankan layanan Kubernetes API Server.</li>
+<li><strong>HAProxy</strong> – Perangkat lunak open source yang berfungsi sebagai Layer 4 (TCP) Load Balancer untuk meneruskan trafik ke seluruh node control plane.</li>
+<li><strong>Kubernetes API Endpoint</strong> – Endpoint utama yang digunakan oleh kubectl, komponen Kubernetes, dan klien lainnya untuk mengelola cluster.</li>
+<li>Untuk algoritma load balancer yang diguanakan adalah <strong>Round-Robin</strong> untuk meneruskan traffic secara bergantian ke setiap backend nodes dan <strong>Protokol</strong> Load balancing yang digunakan adalah mode <strong>TCP / Layer 4 Passthrough</strong>.</li>
+</ul>
+<p>Pada tahap ini persiapan haproxy sebagai load balancer  cluster kubernetes sudah selesai, selanjutnya adalah menginstall cluster kubernetes.</p> </article> <div class="flex justify-center mt-10"> <button id="back-to-top" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium [&_svg]:size-4 [&_svg]:shrink-0"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"> <path d="M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z"></path> </svg> <span>Back to Top</span> </button> </div> <script>
+    /** Scrolls the document to the top when
+     * the "Back to Top" button is clicked. */
+    function backToTop() {
+        document.querySelector("#back-to-top")?.addEventListener("click", () => {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        });
+    }
+
+    backToTop();
+</script>   </main> <footer class="container py-4 text-center"> <p>Knowledge must be free.</p> </footer> </body></html>
