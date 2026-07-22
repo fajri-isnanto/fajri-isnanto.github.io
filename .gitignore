@@ -1,11 +1,11 @@
 # build output
-# dist/
+dist/
 
 # generated types
-#.astro/
+.astro/
 
 # dependencies
-# node_modules/
+node_modules/
 
 # logs
 npm-debug.log*
@@ -19,6 +19,9 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# Windows
+Thumbs.db
 
 # jetbrains setting folder
 # .idea/
