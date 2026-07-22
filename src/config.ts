@@ -5,7 +5,7 @@ export const SITE = {
     tags: ["portfolio", "blog", "red hat", "openshift", "linux", "devops"],
     ogImage: "/og-image.webp",
     logo: "/logo.png",
-    logoText: "Every Cause Has a Root",
+    logoText: "Every Causes Has a Root",
     lang: "en",
     favicon: "/favicon.png",
     repository: "https://github.com/vito8916/simple-portfolio.git",
