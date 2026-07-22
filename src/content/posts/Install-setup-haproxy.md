@@ -128,12 +128,12 @@ Jika sudah pastikan service dalam status aktif dan Dashboard UI sudah accessible
 
 
 
-![dashboard](./images/install-setup-haproxy/dashboard.png)
+
 
 Pada Dashboard UI status master dalam kedaaan mati (merah), ini dikarenakan service api-cluster yang berjalan di node master port 6443 belum bisa diakses. Service tersebut dapat diakses setelah proses Installasi dan Inisiasi Cluster kubernetes selesai.
 
 berikut gambaran jika service backend (master node) sudah bisa dialiri traffik service api-cluster kubernetes.
-![dashboardAktif](./images/install-setup-haproxy/dashboardaktif.png)
+
 
 ## Ringkasan
 
