@@ -126,7 +126,7 @@ alasan saya tidak menggunakan command **systemctl restart haproxy** adalah mengh
 
 Jika sudah pastikan service dalam status aktif dan Dashboard UI sudah accessible di port 8404.
 
-
+![service](./images/install-setup-haproxy/service.png)
 
 ![dashboard](./images/install-setup-haproxy/dashboard.png)
 
