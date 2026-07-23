@@ -20,53 +20,48 @@ const {
     <!-- Top red bar -->
     <div class="cert-card__bar"></div>
 
-    <!-- Header: badge + verified pill -->
-    <div class="cert-card__header">
-        <img src={badgeImage} alt={`${title} badge`} class="cert-card__badge" loading="lazy" />
-        <span class="cert-card__pill">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
-                <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z" clip-rule="evenodd"/>
-            </svg>
-            VERIFIED
-        </span>
-    </div>
+    <!-- Body: 2 columns - badge left, content right -->
+    <div class="cert-card__body">
+        <!-- Left: badge + verified pill -->
+        <div class="cert-card__left">
+            <img src={badgeImage} alt={`${title} badge`} class="cert-card__badge" loading="lazy" />
+            <span class="cert-card__pill">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
+                    <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z" clip-rule="evenodd"/>
+                </svg>
+                VERIFIED
+            </span>
+        </div>
 
-    <!-- Title -->
-    <h3 class="cert-card__title">{title}</h3>
-
-    <!-- Red divider -->
-    <div class="cert-card__divider"></div>
-
-    <!-- Issuer -->
-    <p class="cert-card__issuer">{issuer}</p>
-
-    <!-- Description -->
-    <p class="cert-card__desc">{description}</p>
-
-    <!-- Skill tags -->
-    <div class="cert-card__tags">
-        {tags.map((tag) => <span class="cert-card__tag">{tag}</span>)}
+        <!-- Right: content -->
+        <div class="cert-card__right">
+            <h3 class="cert-card__title">{title}</h3>
+            <div class="cert-card__divider"></div>
+            <p class="cert-card__issuer">{issuer}</p>
+            <p class="cert-card__desc">{description}</p>
+            <div class="cert-card__tags">
+                {tags.map((tag) => <span class="cert-card__tag">{tag}</span>)}
+            </div>
+        </div>
     </div>
 
     <!-- Divider -->
     <div class="cert-card__sep"></div>
 
-    <!-- Footer -->
+    <!-- Footer: 3 columns - Issued | Expiration | Verify -->
     <div class="cert-card__footer">
-        <div class="cert-card__meta">
-            <span class="cert-card__meta-item">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-                    <rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2v4M13 2v4"/>
-                </svg>
-                Issued {issuedDate}
-            </span>
-            <span class="cert-card__meta-item">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-                    <circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/>
-                </svg>
-                {expiration}
-            </span>
-        </div>
+        <span class="cert-card__meta-item">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                <rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2v4M13 2v4"/>
+            </svg>
+            Issued {issuedDate}
+        </span>
+        <span class="cert-card__meta-item">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                <circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/>
+            </svg>
+            {expiration}
+        </span>
         <span class="cert-card__verify">
             Verify on Credly
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
@@ -99,19 +94,26 @@ const {
         flex-shrink: 0;
     }
 
-    .cert-card__header {
+    /* Body: 2 columns */
+    .cert-card__body {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        gap: 16px;
         padding: 20px 20px 0 20px;
-        gap: 12px;
+    }
+
+    /* Left column: badge */
+    .cert-card__left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
     }
 
     .cert-card__badge {
         width: 96px;
         height: auto;
         border-radius: 8px;
-        flex-shrink: 0;
     }
 
     .cert-card__pill {
@@ -127,13 +129,18 @@ const {
         white-space: nowrap;
     }
 
+    /* Right column: content */
+    .cert-card__right {
+        flex: 1;
+        min-width: 0;
+    }
+
     .cert-card__title {
         font-size: 18px;
         font-weight: 800;
         color: #1a1a1a;
         line-height: 1.3;
-        padding: 16px 20px 0 20px;
-        margin: 0;
+        margin: 0 0 10px 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -145,7 +152,7 @@ const {
         height: 3px;
         background: #ee0000;
         border-radius: 2px;
-        margin: 12px 20px 0 20px;
+        margin-bottom: 8px;
     }
 
     .cert-card__issuer {
@@ -153,16 +160,14 @@ const {
         font-weight: 700;
         font-size: 12px;
         text-transform: uppercase;
-        padding: 10px 20px 0 20px;
-        margin: 0;
+        margin: 0 0 6px 0;
     }
 
     .cert-card__desc {
         color: #5a6169;
         font-size: 14.5px;
         line-height: 1.55;
-        padding: 8px 20px 0 20px;
-        margin: 0;
+        margin: 0 0 12px 0;
         display: -webkit-box;
         -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
@@ -173,7 +178,6 @@ const {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        padding: 14px 20px 0 20px;
     }
 
     .cert-card__tag {
@@ -191,18 +195,14 @@ const {
         margin: 16px 20px 0 20px;
     }
 
+    /* Footer: 3 columns */
     .cert-card__footer {
-        padding: 16px 20px 20px 20px;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
         gap: 12px;
+        padding: 14px 20px 20px 20px;
         margin-top: auto;
-    }
-
-    .cert-card__meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
+        align-items: center;
     }
 
     .cert-card__meta-item {
@@ -211,6 +211,7 @@ const {
         gap: 5px;
         color: #ee0000;
         font-size: 13px;
+        white-space: nowrap;
     }
 
     .cert-card__verify {
@@ -222,9 +223,9 @@ const {
         color: #ee0000;
         font-weight: 700;
         font-size: 13px;
-        padding: 10px 0;
+        padding: 8px 14px;
         border-radius: 10px;
-        width: 100%;
+        white-space: nowrap;
         transition: background 150ms ease, color 150ms ease;
     }
 
