@@ -14,10 +14,8 @@ interface Project {
     };
 }
 
-const hiddenProjectIds = new Set(['finance-app', 'pro-accountant']);
-
 const allProjects = (await getCollection('projects'))
-    .filter((project) => !project.data.draft && !hiddenProjectIds.has(project.id))
+    .filter((project) => !project.data.draft)
     .sort((a, b) => b.data.startDate.getTime() - a.data.startDate.getTime());
 ---
 

@@ -7,9 +7,8 @@ import BackBtn from "@/components/BackBtn.astro";
 import BackToTop from "../../components/BackToTop.astro";
 
 export async function getStaticPaths() {
-    const hiddenProjectIds = new Set(['finance-app', 'pro-accountant']);
     const posts = (await getCollection('projects'))
-        .filter((post) => !post.data.draft && !hiddenProjectIds.has(post.id));
+        .filter((post) => !post.data.draft);
     return posts.map(post => ({
         params: { id: post.id },
         props: { post },
@@ -20,9 +19,8 @@ const { post } = Astro.props;
 const { title, summary, tags, cover, ogImage, url } = post.data;
 
 const { Content } = await render(post);
-
 ---
-<Layout title={title} description={summary} imageOg={ogImage} scrollSmooth={true}>
+<Layout title={title} description={summary} imageOg={ogImage} scrollSmooth={true} mainClass="mx-auto w-full max-w-5xl px-6 md:px-8">
     <>
         <div class="flex justify-center mt-10">
             <BackBtn/>
@@ -33,7 +31,7 @@ const { Content } = await render(post);
                 {tags.join(', ')}
             </p>
         </div>
-        <Image transition:name={`${post.id}-image`} class="rounded-2xl" src={cover} alt="Main project image"/>
+        <Image transition:name={`${post.id}-image`} class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700" src={cover} alt={title}/>
         <p>
             {summary}
         </p>
@@ -41,16 +39,9 @@ const { Content } = await render(post);
             Visit the project ↗
         </a>
 
-        <article id="article" class="mt-8 prose dark:prose-invert">
+        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert">
             <Content/>
         </article>
         <BackToTop />
     </>
 </Layout>
-
-<style is:global>
-    h2 {
-        @apply text-2xl font-bold my-4;
-    }
-</style>
-
