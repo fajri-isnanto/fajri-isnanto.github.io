@@ -1,21 +1,19 @@
 ---
 import { ME } from '@/config';
-import CertificationCardV1 from './CertificationCardV1.astro';
 import CertificationCardV2 from './CertificationCardV2.astro';
 
 const { certifications } = ME;
 ---
 
 <div class="relative left-1/2 -translate-x-1/2 w-screen">
-    <div class="max-w-[800px] mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4">
         <div class="flex flex-col gap-10 text-n700 dark:text-n200 w-full mt-10">
             <div class="mb-4">
                 <h2 class="text-3xl font-bold mb-2">Certifications</h2>
                 <p class="text-sm text-gray-500">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
             </div>
 
-            <!-- V2 Enterprise Cards -->
-            <div class="flex flex-col gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {certifications.map((cert) => (
                     <CertificationCardV2
                         title={cert.name}
@@ -26,26 +24,10 @@ const { certifications } = ME;
                         issueDate={cert.issueDate}
                         skills={cert.skills}
                         verified={cert.verified}
+                        compact={true}
                     />
                 ))}
             </div>
-
-            <!-- V1 Minimal (commented - uncomment to switch)
-            <div class="flex flex-col gap-6">
-                {certifications.map((cert) => (
-                    <CertificationCardV1
-                        title={cert.name}
-                        vendor={cert.issuer}
-                        description={cert.description}
-                        badgeImage={cert.badgeImage}
-                        verifyUrl={cert.credlyUrl}
-                        issueDate={cert.issueDate}
-                        skills={cert.skills}
-                        verified={cert.verified}
-                    />
-                ))}
-            </div>
-            -->
         </div>
     </div>
 </div>
