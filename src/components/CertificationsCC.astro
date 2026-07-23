@@ -1,32 +1,69 @@
 ---
 import { ME } from '@/config';
-import CertificationBadge from './CertificationBadge.astro';
+import CertCard from './CertCard.astro';
 
 const { certifications } = ME;
 ---
 
-<div class="relative left-1/2 -translate-x-1/2 w-screen">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex flex-col gap-10 text-n700 dark:text-n200 w-full mt-10">
-            <div class="mb-4">
-                <h2 class="text-3xl font-bold mb-2">Certifications</h2>
-                <p class="text-sm text-gray-500">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
-            </div>
+<section class="certs-section">
+    <div class="certs-section__inner">
+        <h2 class="certs-section__title">Certifications</h2>
+        <p class="certs-section__sub">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {certifications.map((cert) => (
-                    <CertificationBadge
-                        badgeImage={cert.badgeImage}
-                        title={cert.name}
-                        issuer={cert.issuer}
-                        description={cert.description}
-                        tags={cert.skills}
-                        issuedDate={cert.issueDate}
-                        expiration="No Expiration"
-                        verifyUrl={cert.credlyUrl}
-                    />
-                ))}
-            </div>
+        <div class="certs-section__grid">
+            {certifications.map((cert) => (
+                <CertCard
+                    badgeImage={cert.badgeImage}
+                    title={cert.name}
+                    issuer={cert.issuer}
+                    description={cert.description}
+                    tags={cert.skills}
+                    issuedDate={cert.issueDate}
+                    verifyUrl={cert.credlyUrl}
+                />
+            ))}
         </div>
     </div>
-</div>
+</section>
+
+<style>
+    .certs-section {
+        background: #f3f4f6;
+        padding: 40px 0;
+        width: 100%;
+    }
+
+    .certs-section__inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .certs-section__title {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0 0 6px 0;
+    }
+
+    .certs-section__sub {
+        font-size: 15px;
+        color: #5a6169;
+        margin: 0 0 28px 0;
+    }
+
+    .certs-section__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+        .certs-section__grid {
+            grid-template-columns: 1fr;
+        }
+        .certs-section__title {
+            font-size: 26px;
+        }
+    }
+</style>
