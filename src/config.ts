@@ -44,13 +44,15 @@ export const ME = {
             issuer: "Red Hat",
             credlyUrl: "https://www.credly.com/badges/",
             badgeImage: "/certs/rhcsa-badge.png",
+            badgeId: "",
         },
         {
             name: "Red Hat Certified OpenShift Administrator",
             shortName: "RHOCP",
             issuer: "Red Hat",
-            credlyUrl: "https://www.credly.com/badges/",
+            credlyUrl: "https://www.credly.com/badges/467d6229-c602-433c-835d-75939c941772",
             badgeImage: "/certs/rhocp-badge.png",
+            badgeId: "467d6229-c602-433c-835d-75939c941772",
         },
         {
             name: "Red Hat Certified Specialist in Containers",
@@ -58,6 +60,7 @@ export const ME = {
             issuer: "Red Hat",
             credlyUrl: "https://www.credly.com/badges/",
             badgeImage: "/certs/rhcsc-badge.png",
+            badgeId: "",
         },
     ],
 }
