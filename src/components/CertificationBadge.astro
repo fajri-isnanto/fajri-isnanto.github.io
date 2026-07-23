@@ -1,0 +1,281 @@
+---
+export interface Props {
+    badgeImage: string;
+    badgeAlt?: string;
+    status?: string;
+    title: string;
+    issuer: string;
+    description: string;
+    tags?: string[];
+    issuedDate: string;
+    expiration?: string;
+    verifyUrl?: string;
+    verifyLabel?: string;
+}
+
+const {
+    badgeImage,
+    badgeAlt = "Certification badge",
+    status = "VERIFIED",
+    title,
+    issuer,
+    description,
+    tags = [],
+    issuedDate,
+    expiration = "",
+    verifyUrl,
+    verifyLabel = "Verify on Credly",
+} = Astro.props;
+---
+
+<style>
+    .credly-card {
+        --red: #ee0000;
+        --red-dark: #cc0000;
+        --text-dark: #1a1a1a;
+        --text-gray: #5a6169;
+        --border: #e6e8eb;
+        --bg: #ffffff;
+
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--bg);
+        border-radius: 20px;
+        box-shadow: 0 20px 50px -20px rgba(0,0,0,.15);
+        overflow: hidden;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .credly-card__top-bar {
+        height: 6px;
+        background: linear-gradient(90deg, var(--red), var(--red-dark));
+    }
+
+    .credly-card__body {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2.5rem;
+        align-items: flex-start;
+    }
+
+    .credly-card__badge {
+        flex: 0 0 220px;
+    }
+
+    .credly-card__badge img {
+        width: 100%;
+        height: auto;
+        border-radius: 14px;
+        display: block;
+    }
+
+    .credly-card__content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .credly-card__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #e6f7ec;
+        color: #1b9c4d;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        margin-bottom: 1.25rem;
+    }
+
+    .credly-card__title {
+        font-size: 2rem;
+        line-height: 1.2;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 0 0 1rem 0;
+    }
+
+    .credly-card__divider {
+        width: 40px;
+        height: 4px;
+        background: var(--red);
+        border-radius: 2px;
+        margin-bottom: 1rem;
+    }
+
+    .credly-card__issuer {
+        color: var(--red);
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        margin: 0 0 0.6rem 0;
+    }
+
+    .credly-card__description {
+        color: var(--text-gray);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .credly-card__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .credly-card__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        background: #fff;
+    }
+
+    .credly-card__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 2.5rem;
+    }
+
+    .credly-card__meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+    }
+
+    .credly-card__meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--red);
+    }
+
+    .credly-card__meta-item svg {
+        color: var(--red);
+    }
+
+    .credly-card__meta-divider {
+        width: 1px;
+        height: 18px;
+        background: var(--border);
+    }
+
+    .credly-card__verify {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1.5px solid var(--red);
+        color: var(--red);
+        font-weight: 700;
+        text-decoration: none;
+        padding: 0.7rem 1.3rem;
+        border-radius: 10px;
+        transition: background .15s ease, color .15s ease;
+    }
+
+    .credly-card__verify:hover {
+        background: var(--red);
+        color: #fff;
+    }
+
+    @media (max-width: 640px) {
+        .credly-card__body {
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+        .credly-card__badge {
+            flex: none;
+            width: 160px;
+            margin: 0 auto;
+        }
+        .credly-card__title {
+            font-size: 1.5rem;
+        }
+        .credly-card__footer {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="credly-card">
+    <div class="credly-card__top-bar"></div>
+
+    <div class="credly-card__body">
+        <div class="credly-card__badge">
+            <img src={badgeImage} alt={badgeAlt} loading="lazy" />
+        </div>
+
+        <div class="credly-card__content">
+            <span class="credly-card__status">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z" clip-rule="evenodd"/>
+                </svg>
+                {status}
+            </span>
+
+            <h2 class="credly-card__title">{title}</h2>
+
+            <div class="credly-card__divider"></div>
+
+            <p class="credly-card__issuer">{issuer}</p>
+            <p class="credly-card__description">{description}</p>
+
+            {tags.length > 0 && (
+                <div class="credly-card__tags">
+                    {tags.map((tag) => (
+                        <span class="credly-card__tag">{tag}</span>
+                    ))}
+                </div>
+            )}
+        </div>
+    </div>
+
+    <div class="credly-card__footer">
+        <div class="credly-card__meta">
+            <span class="credly-card__meta-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                    <rect x="3" y="4" width="14" height="13" rx="2"/>
+                    <path d="M3 8h14M7 2v4M13 2v4"/>
+                </svg>
+                Issued {issuedDate}
+            </span>
+
+            {expiration && (
+                <>
+                    <span class="credly-card__meta-divider"></span>
+                    <span class="credly-card__meta-item">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                            <circle cx="10" cy="10" r="7"/>
+                            <path d="M10 6v4l3 2"/>
+                        </svg>
+                        {expiration}
+                    </span>
+                </>
+            )}
+        </div>
+
+        {verifyUrl && (
+            <a class="credly-card__verify" href={verifyUrl} target="_blank" rel="noopener noreferrer">
+                {verifyLabel}
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                    <path d="M7 13L13 7M13 7H8M13 7v5"/>
+                </svg>
+            </a>
+        )}
+    </div>
+</div>
