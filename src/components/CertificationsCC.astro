@@ -1,62 +1,49 @@
 ---
 import { ME } from '@/config';
-import CertCard from './CertCard.astro';
+import CertCardV2 from './CertCard.astro';
+import CertCardV1 from './CertificationCardV2.astro';
 
 const { certifications } = ME;
 ---
 
 <div class="relative left-1/2 -translate-x-1/2 w-screen">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="mt-10">
-            <h2 class="certs-title">Certifications</h2>
-            <p class="certs-sub">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
+    <div class="max-w-7xl mx-auto px-4 mt-10">
 
-            <div class="certs-grid">
-                {certifications.map((cert) => (
-                    <CertCard
-                        badgeImage={cert.badgeImage}
-                        title={cert.name}
-                        issuer={cert.issuer}
-                        description={cert.description}
-                        tags={cert.skills}
-                        issuedDate={cert.issueDate}
-                        verifyUrl={cert.credlyUrl}
-                    />
-                ))}
-            </div>
+        <!-- V2 -->
+        <h2 class="text-2xl font-bold mb-1 text-[#111827]">V2 — Credly-Style (current)</h2>
+        <p class="text-sm text-gray-500 mb-6">Badge 96px kiri, VERIFIED kanan atas, 2-col body + 3-col footer, 60% typography</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+            {certifications.map((cert) => (
+                <CertCardV2
+                    badgeImage={cert.badgeImage}
+                    title={cert.name}
+                    issuer={cert.issuer}
+                    description={cert.description}
+                    tags={cert.skills}
+                    issuedDate={cert.issueDate}
+                    verifyUrl={cert.credlyUrl}
+                />
+            ))}
         </div>
+
+        <!-- V1 -->
+        <h2 class="text-2xl font-bold mb-1 text-[#111827]">V1 — Compact Grid (sebelumnya)</h2>
+        <p class="text-sm text-gray-500 mb-6">Badge tengah, layout stack vertikal per card, 3 kolom compact</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {certifications.map((cert) => (
+                <CertCardV1
+                    compact={true}
+                    title={cert.name}
+                    vendor={cert.issuer}
+                    description={cert.description}
+                    badgeImage={cert.badgeImage}
+                    verifyUrl={cert.credlyUrl}
+                    issueDate={cert.issueDate}
+                    skills={cert.skills}
+                    verified={cert.verified}
+                />
+            ))}
+        </div>
+
     </div>
 </div>
-
-<style>
-    .certs-title {
-        font-size: 25px;
-        font-weight: 800;
-        line-height: 1.1;
-        letter-spacing: -0.03em;
-        color: #111827;
-        margin: 0 0 6px 0;
-        font-family: "Inter Variable", "Geist", "SF Pro Display", system-ui, sans-serif;
-    }
-
-    .certs-sub {
-        font-size: 15px;
-        color: #5a6169;
-        margin: 0 0 28px 0;
-    }
-
-    .certs-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-    }
-
-    @media (max-width: 900px) {
-        .certs-grid {
-            grid-template-columns: 1fr;
-        }
-        .certs-title {
-            font-size: 26px;
-        }
-    }
-</style>
