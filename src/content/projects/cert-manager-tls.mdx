@@ -1,0 +1,26 @@
+---
+draft: false
+title: Otomatisasi TLS dengan Cert-Manager
+tags:
+  - kubernetes
+  - cert-manager
+  - tls
+  - security
+summary:
+  Deploy cert-manager untuk otomatisasi penerbitan dan renewal sertifikat TLS di Kubernetes, terintegrasi dengan Let's Encrypt dan ClusterIssuer.
+startDate: 2026-07-18
+endDate: 2026-07-18
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+Cert-manager mengotomatisasi manajemen sertifikat TLS di Kubernetes, mendukung berbagai issuer termasuk Let's Encrypt, Vault, dan self-signed. Konfigurasi ClusterIssuer untuk wildcard domain.
+
+## Requirement
+- Kubernetes cluster
+- Helm v3
+- Domain yang bisa di-verify (untuk production issuer)
+
+## Ringkasan
+Cert-manager siap menerbitkan sertifikat TLS otomatis dengan auto-renewal, menghilangkan risiko expired certificate untuk ingress/service.

@@ -5,6 +5,7 @@ import ProfileActionButton from "../components/ProfileActionButton.astro";
 import TabsButtons from "../components/TabsButtons.tsx";
 import ProjectsCC from '@/components/ProjectsCC.astro';
 import AboutMeCC from "../components/AboutMeCC.astro";
+import CertificationsCC from "../components/CertificationsCC.astro";
 import ProfileFacts from "../components/ProfileFacts.astro";
 ---
 
@@ -16,6 +17,7 @@ import ProfileFacts from "../components/ProfileFacts.astro";
         <TabsButtons client:idle>
             <ProjectsCC slot="portfolio"/>
             <AboutMeCC slot="about"/>
+            <CertificationsCC slot="certifications"/>
         </TabsButtons>
     </>
 </Layout>

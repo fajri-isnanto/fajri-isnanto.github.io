@@ -37,6 +37,29 @@ export const ME = {
         resumeDoc: "fajri-isnanto-cv.pdf",
     },
     aboutMe: "Certified Red Hat engineer with practical experience managing Linux platforms, Red Hat Enterprise Linux, Red Hat Satellite, and OpenShift environments. I focus on platform operations, system hardening, automation, troubleshooting, CI/CD support, and reliable infrastructure delivery for production systems.",
+    certifications: [
+        {
+            name: "Red Hat Certified System Administrator",
+            shortName: "RHCSA",
+            issuer: "Red Hat",
+            credlyUrl: "https://www.credly.com/badges/",
+            badgeImage: "/certs/rhcsa-badge.svg",
+        },
+        {
+            name: "Red Hat Certified OpenShift Administrator",
+            shortName: "RHOCP",
+            issuer: "Red Hat",
+            credlyUrl: "https://www.credly.com/badges/",
+            badgeImage: "/certs/rhocp-badge.svg",
+        },
+        {
+            name: "Red Hat Certified Specialist in Containers",
+            shortName: "RHCSC",
+            issuer: "Red Hat",
+            credlyUrl: "https://www.credly.com/badges/",
+            badgeImage: "/certs/rhcsc-badge.svg",
+        },
+    ],
 }
 
 export const SOCIALS = [

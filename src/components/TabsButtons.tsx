@@ -6,12 +6,16 @@ const TabsButtons = (props:any) => {
             <TabsList className={"bg-white dark:bg-n700  w-full px-2 py-8 rounded-xl"}>
                 <TabsTrigger className={"w-full py-4 rounded-lg dark:data-[state=active]:text-primary-dark data-[state=active]:bg-light-theme dark:data-[state=active]:bg-dark-theme"} value="portfolio">Portfolio</TabsTrigger>
                 <TabsTrigger className={"w-full py-4 rounded-lg dark:data-[state=active]:text-primary-dark data-[state=active]:bg-light-theme dark:data-[state=active]:bg-dark-theme"} value="about">About</TabsTrigger>
+                <TabsTrigger className={"w-full py-4 rounded-lg dark:data-[state=active]:text-primary-dark data-[state=active]:bg-light-theme dark:data-[state=active]:bg-dark-theme"} value="certifications">Certifications</TabsTrigger>
             </TabsList>
             <TabsContent value="portfolio">
                 {props.portfolio}
             </TabsContent>
             <TabsContent value="about">
                 {props.about}
+            </TabsContent>
+            <TabsContent value="certifications">
+                {props.certifications}
             </TabsContent>
         </Tabs>
     );

@@ -1,0 +1,26 @@
+---
+draft: false
+title: Backup & Disaster Recovery dengan Velero
+tags:
+  - kubernetes
+  - velero
+  - backup
+  - disaster-recovery
+summary:
+  Setup Velero untuk backup dan restore cluster Kubernetes ke MinIO S3-compatible storage, termasuk schedule backup harian dan restore drill untuk validasi RTO/RPO.
+startDate: 2026-07-16
+endDate: 2026-07-16
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+Velero adalah tool open-source untuk backup, restore, dan migrasi resource Kubernetes serta persistent volume. Integrasi dengan S3-compatible storage untuk off-cluster backup.
+
+## Requirement
+- Kubernetes cluster
+- S3-compatible storage (MinIO)
+- Velero CLI
+
+## Ringkasan
+Velero berhasil dikonfigurasi dengan scheduled backup harian, siap untuk disaster recovery scenario dengan RTO yang terukur.

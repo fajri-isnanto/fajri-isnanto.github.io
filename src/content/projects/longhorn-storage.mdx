@@ -1,0 +1,26 @@
+---
+draft: false
+title: Deploy Longhorn Distributed Storage di Kubernetes
+tags:
+  - kubernetes
+  - storage
+  - longhorn
+  - csi
+summary:
+  Deploy Longhorn sebagai distributed block storage dengan CSI driver untuk Kubernetes, termasuk konfigurasi StorageClass, snapshot, dan backup ke S3.
+startDate: 2026-07-19
+endDate: 2026-07-19
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+Longhorn adalah distributed block storage system yang ringan dan mudah dioperasikan untuk Kubernetes. Mendukung snapshot, backup, disaster recovery, dan CSI-compliant.
+
+## Requirement
+- Kubernetes cluster
+- Node dengan disk tersedia
+- open-iscsi terinstall di semua node
+
+## Ringkasan
+Longhorn berhasil dideploy dengan beberapa StorageClass untuk tiering storage, siap melayani PVC workload stateful.

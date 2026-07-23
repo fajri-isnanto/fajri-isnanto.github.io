@@ -1,0 +1,26 @@
+---
+draft: false
+title: Deploy Cilium CNI untuk Kubernetes Cluster
+tags:
+  - kubernetes
+  - cilium
+  - cni
+  - ebpf
+summary:
+  Deploy Cilium sebagai CNI plugin pengganti default untuk cluster Kubernetes, termasuk konfigurasi Hubble observability dan NetworkPolicy berbasis eBPF.
+startDate: 2026-07-21
+endDate: 2026-07-21
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+Cilium menyediakan networking, observability, dan security berbasis eBPF tanpa overhead iptables. Deploy menggunakan Helm dengan konfigurasi kube-proxy replacement dan Hubble UI untuk visibility traffic.
+
+## Requirement
+- Kubernetes cluster sudah berjalan
+- Helm v3 terinstall
+- Kernel 5.10+
+
+## Ringkasan
+Cilium berhasil dideploy sebagai primary CNI dengan Hubble observability, siap untuk implementasi NetworkPolicy L7 dan service mesh.

@@ -36,6 +36,8 @@ const allProjects = (await getCollection('projects'))
                                 title={project.data.title}
                                 tags={project.data.tags}
                                 cover={project.data.cover}
+                                startDate={project.data.startDate}
+                                summary={project.data.summary}
                         />
                 ))
             ) : (

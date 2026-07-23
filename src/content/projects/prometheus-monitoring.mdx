@@ -1,0 +1,26 @@
+---
+draft: false
+title: Monitoring Stack dengan Prometheus & Grafana
+tags:
+  - kubernetes
+  - prometheus
+  - grafana
+  - monitoring
+summary:
+  Deploy kube-prometheus-stack untuk monitoring cluster Kubernetes, mencakup metrics, alerting rules, dan dashboard Grafana untuk node, pod, dan service.
+startDate: 2026-07-17
+endDate: 2026-07-17
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+kube-prometheus-stack menyediakan monitoring end-to-end: Prometheus untuk metrics collection, Alertmanager untuk alert routing, dan Grafana dengan pre-built dashboards untuk visibility cluster.
+
+## Requirement
+- Kubernetes cluster
+- Helm v3
+- StorageClass untuk persistent metrics
+
+## Ringkasan
+Monitoring stack lengkap berjalan dengan alert rules untuk node, pod, dan service. Dashboard Grafana siap untuk operational visibility.

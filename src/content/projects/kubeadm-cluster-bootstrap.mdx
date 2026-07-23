@@ -1,0 +1,26 @@
+---
+draft: false
+title: Bootstrap Kubernetes Cluster dengan Kubeadm
+tags:
+  - kubernetes
+  - kubeadm
+  - containerd
+summary:
+  Step-by-step bootstrap cluster Kubernetes vanilla menggunakan kubeadm dengan containerd sebagai container runtime, termasuk inisialisasi control-plane dan join worker node.
+startDate: 2026-07-23
+endDate: 2026-07-23
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+Proses bootstrap cluster Kubernetes menggunakan kubeadm meliputi instalasi containerd, kubeadm, kubelet, dan kubectl di semua node. Dilanjutkan dengan inisialisasi control-plane menggunakan `kubeadm init` dan join worker node dengan token yang dihasilkan.
+
+## Requirement
+- OS Ubuntu Server 24.04 LTS
+- Minimal 2 GB RAM, 2 CPU
+- Koneksi internet
+- Container runtime (containerd)
+
+## Ringkasan
+Cluster Kubernetes vanilla berhasil di-bootstrap dengan kubeadm, siap untuk deployment workload dan integrasi dengan CNI, CSI, dan komponen infrastruktur lainnya.

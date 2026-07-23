@@ -1,0 +1,38 @@
+---
+import { ME } from '@/config';
+
+const { certifications } = ME;
+---
+
+<section class="mt-8">
+    <h2 class="text-2xl font-bold mb-4">Certifications</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {certifications.map((cert) => (
+            <a
+                href={cert.credlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-red-500 dark:hover:border-red-500 transition-colors group"
+            >
+                <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <img
+                        src={cert.badgeImage}
+                        alt={`${cert.shortName} badge`}
+                        class="w-14 h-14 object-contain"
+                        loading="lazy"
+                    />
+                </div>
+                <div class="flex flex-col gap-1 min-w-0">
+                    <span class="text-xs font-mono text-red-600 dark:text-red-400">{cert.shortName}</span>
+                    <span class="text-sm font-medium text-n700 dark:text-n200 leading-tight">{cert.name}</span>
+                    <span class="text-xs text-gray-500">{cert.issuer}</span>
+                </div>
+                <div class="flex-shrink-0 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                </div>
+            </a>
+        ))}
+    </div>
+</section>

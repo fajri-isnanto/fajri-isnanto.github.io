@@ -1,0 +1,46 @@
+---
+import { ME } from '@/config';
+
+const { certifications } = ME;
+---
+
+<div class="relative flex flex-col gap-8 text-n700 dark:text-n200 w-full mt-10 px-4">
+    <div class="mb-4">
+        <h2 class="text-3xl font-bold mb-2">Certifications</h2>
+        <p class="text-sm text-gray-500">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {certifications.map((cert) => (
+            <a
+                href={cert.credlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex flex-col items-center gap-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-red-500 dark:hover:border-red-500 hover:shadow-lg transition-all group"
+            >
+                <div class="w-28 h-28 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center p-2">
+                    <img
+                        src={cert.badgeImage}
+                        alt={`${cert.shortName} certification badge`}
+                        class="w-full h-full object-contain"
+                        loading="lazy"
+                    />
+                </div>
+                <div class="flex flex-col items-center gap-1 text-center">
+                    <span class="text-xs font-mono font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded">
+                        {cert.shortName}
+                    </span>
+                    <span class="text-sm font-semibold text-n700 dark:text-n200 leading-tight">
+                        {cert.name}
+                    </span>
+                    <span class="text-xs text-gray-500">{cert.issuer}</span>
+                </div>
+                <div class="flex items-center gap-1 text-xs text-gray-400 group-hover:text-red-500 transition-colors mt-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Verify on Credly
+                </div>
+            </a>
+        ))}
+    </div>
+</div>

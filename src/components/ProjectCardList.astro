@@ -1,6 +1,7 @@
 ---
 // astro imports
 import { Image } from 'astro:assets';
+import ClockIcon from "@/icons/time-line.svg";
 
 // library imports
 import {cn} from "../lib/utils";
@@ -11,9 +12,11 @@ interface Props {
     tags: string[];
     cover: ImageMetadata;
     id: string;
+    startDate: Date;
+    summary: string;
 }
 
-const { title, tags, cover, id } = Astro.props as Props;
+const { title, tags, cover, id, startDate, summary } = Astro.props as Props;
 ---
 
 <a href={`/projects/${id}`} class="project-card" aria-label={`View project "${title}"`}>
@@ -27,14 +30,24 @@ const { title, tags, cover, id } = Astro.props as Props;
             />
         </div>
         <div class="flex flex-col gap-2 flex-1">
-            <p class="text-sm text-n500 dark:text-light-theme">
-                {tags.join(', ')}
-            </p>
-            <div class="flex items-center justify-between mb-2">
-                <h6 class={cn("font-semibold text-xl", "text-n500 dark:text-white")}>
-                    {title}
-                </h6>
+            <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1">
+                    <ClockIcon class="w-4 h-4 text-gray-500"/>
+                    <time class="text-sm text-gray-500" datetime={startDate.toISOString()}>
+                        {startDate.toDateString()}
+                    </time>
+                </div>
+                <span class="text-gray-500">&middot;</span>
+                <div class="flex gap-2">
+                    {tags.map((tag) => (
+                        <span class="text-sm text-gray-500">#{tag}</span>
+                    ))}
+                </div>
             </div>
+            <h6 class={cn("font-semibold text-xl", "text-n500 dark:text-white")}>
+                {title}
+            </h6>
+            <p class="text-sm text-gray-500">{summary}</p>
         </div>
     </div>
 </a>

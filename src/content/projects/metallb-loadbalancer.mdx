@@ -1,0 +1,25 @@
+---
+draft: false
+title: Setup MetalLB Load Balancer untuk Bare-Metal
+tags:
+  - kubernetes
+  - metallb
+  - bare-metal
+  - loadbalancer
+summary:
+  Konfigurasi MetalLB sebagai load balancer on-premise untuk cluster Kubernetes bare-metal, menggunakan mode L2 advertisement dengan IP pool dari subnet lokal.
+startDate: 2026-07-20
+endDate: 2026-07-20
+url: ""
+cover: './images/install-setup-haproxy/cover.png'
+ogImage: './images/install-setup-haproxy/cover.png'
+---
+
+MetalLB adalah implementasi load balancer untuk cluster Kubernetes yang berjalan di bare-metal tanpa cloud provider. Mode L2 menggunakan ARP/NDP untuk mengumumkan IP service ke jaringan lokal.
+
+## Requirement
+- Kubernetes cluster tanpa cloud provider
+- Subnet IP yang tersedia untuk pool load balancer
+
+## Ringkasan
+MetalLB berhasil dikonfigurasi, service type LoadBalancer kini mendapatkan external IP dari pool yang ditentukan.
