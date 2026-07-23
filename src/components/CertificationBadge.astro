@@ -38,7 +38,7 @@ const {
         --bg: #ffffff;
 
         position: relative;
-        max-width: 900px;
+        max-width: 100%;
         margin: 0 auto;
         background: var(--bg);
         border-radius: 20px;
@@ -136,6 +136,7 @@ const {
         font-size: 0.9rem;
         color: var(--text-dark);
         background: #fff;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     }
 
     .credly-card__footer {
@@ -191,23 +192,38 @@ const {
         color: #fff;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 1024px) {
         .credly-card__body {
             flex-direction: column;
             padding: 1.5rem;
         }
         .credly-card__badge {
             flex: none;
-            width: 160px;
+            width: 140px;
             margin: 0 auto;
         }
         .credly-card__title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
         .credly-card__footer {
             flex-direction: column;
             align-items: flex-start;
             padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .credly-card__body {
+            padding: 1.25rem;
+        }
+        .credly-card__badge {
+            width: 120px;
+        }
+        .credly-card__title {
+            font-size: 1.1rem;
+        }
+        .credly-card__footer {
+            padding: 1.25rem;
         }
     }
 </style>
