@@ -45,6 +45,10 @@ export const ME = {
             credlyUrl: "https://www.credly.com/badges/4bd5f873-79d6-402d-ad27-973cdfcda95b/public_url",
             badgeImage: "/certs/rhcsa-badge.png",
             badgeId: "",
+            description: "Validates core Linux system administration skills including file systems, partitioning, LVM, SELinux, firewalls, troubleshooting, and automation with shell scripting.",
+            skills: ["Linux", "RHEL", "SELinux", "LVM", "Troubleshooting"],
+            issueDate: "2023-08-15",
+            verified: true,
         },
         {
             name: "Red Hat Certified OpenShift Administrator",
@@ -53,6 +57,10 @@ export const ME = {
             credlyUrl: "https://www.credly.com/badges/467d6229-c602-433c-835d-75939c941772/public_url",
             badgeImage: "/certs/rhocp-badge.png",
             badgeId: "467d6229-c602-433c-835d-75939c941772",
+            description: "Demonstrates ability to deploy, configure, and manage Red Hat OpenShift clusters including networking, storage, security, logging, monitoring, and application lifecycle.",
+            skills: ["OpenShift", "Kubernetes", "Containers", "Operators", "Helm"],
+            issueDate: "2024-04-20",
+            verified: true,
         },
         {
             name: "Red Hat Certified Specialist in Containers",
@@ -61,6 +69,10 @@ export const ME = {
             credlyUrl: "https://www.credly.com/badges/f259c804-ad85-417c-9178-4b6886fb422a/public_url",
             badgeImage: "/certs/rhcsc-badge.png",
             badgeId: "",
+            description: "Proves expertise in container management including Podman, Docker, OpenShift, image creation, registries, and container orchestration fundamentals.",
+            skills: ["Containers", "Podman", "Docker", "Registries", "Kubernetes"],
+            issueDate: "2024-09-10",
+            verified: true,
         },
     ],
 }

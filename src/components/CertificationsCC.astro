@@ -1,57 +1,51 @@
 ---
 import { ME } from '@/config';
+import CertificationCardV1 from './CertificationCardV1.astro';
+import CertificationCardV2 from './CertificationCardV2.astro';
 
 const { certifications } = ME;
 ---
 
 <div class="relative left-1/2 -translate-x-1/2 w-screen">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex flex-col gap-8 text-n700 dark:text-n200 w-full mt-10">
+    <div class="max-w-[800px] mx-auto px-4">
+        <div class="flex flex-col gap-10 text-n700 dark:text-n200 w-full mt-10">
             <div class="mb-4">
                 <h2 class="text-3xl font-bold mb-2">Certifications</h2>
                 <p class="text-sm text-gray-500">Verified credentials from Red Hat. Click any badge to verify on Credly.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- V2 Enterprise Cards -->
+            <div class="flex flex-col gap-6">
                 {certifications.map((cert) => (
-                    <a
-                        href={cert.credlyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="flex flex-col items-center gap-5 p-8 rounded-2xl
-                               bg-transparent
-                               border border-transparent
-                               transition-all duration-300 group"
-                    >
-                        <div class="w-32 h-32 rounded-2xl overflow-hidden
-                                    bg-transparent
-                                    flex items-center justify-center p-3
-                                    transition-all duration-300 ease-out
-                                    group-hover:scale-[1.5]
-                                    group-hover:drop-shadow-[0_0_24px_rgba(238,0,0,0.35)]">
-                            <img
-                                src={cert.badgeImage}
-                                alt={`${cert.shortName} certification badge`}
-                                class="w-full h-full object-contain
-                                       transition-all duration-300"
-                                loading="lazy"
-                            />
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-center">
-                            <span class="text-base font-semibold text-n700 dark:text-n100 leading-tight">
-                                {cert.name}
-                            </span>
-                            <span class="text-xs text-red-600 dark:text-red-400 font-medium tracking-wide uppercase">{cert.issuer}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs text-gray-400
-                                    group-hover:text-red-500 transition-colors mt-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            Verify on Credly
-                        </div>
-                    </a>
+                    <CertificationCardV2
+                        title={cert.name}
+                        vendor={cert.issuer}
+                        description={cert.description}
+                        badgeImage={cert.badgeImage}
+                        verifyUrl={cert.credlyUrl}
+                        issueDate={cert.issueDate}
+                        skills={cert.skills}
+                        verified={cert.verified}
+                    />
                 ))}
             </div>
+
+            <!-- V1 Minimal (commented - uncomment to switch)
+            <div class="flex flex-col gap-6">
+                {certifications.map((cert) => (
+                    <CertificationCardV1
+                        title={cert.name}
+                        vendor={cert.issuer}
+                        description={cert.description}
+                        badgeImage={cert.badgeImage}
+                        verifyUrl={cert.credlyUrl}
+                        issueDate={cert.issueDate}
+                        skills={cert.skills}
+                        verified={cert.verified}
+                    />
+                ))}
+            </div>
+            -->
         </div>
     </div>
 </div>
