@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-  <rect width="120" height="120" rx="12" fill="#1a1a2e"/>
-  <text x="60" y="52" text-anchor="middle" fill="#ee0000" font-family="sans-serif" font-size="14" font-weight="bold">RED HAT</text>
-  <text x="60" y="75" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="bold">RHOCP</text>
-  <text x="60" y="95" text-anchor="middle" fill="#888888" font-family="sans-serif" font-size="9">OpenShift Admin</text>
-</svg>
