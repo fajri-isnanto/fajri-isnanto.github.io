@@ -71,7 +71,7 @@ export const ME = {
             credlyUrl: "https://www.credly.com/badges/467d6229-c602-433c-835d-75939c941772/public_url",
             badgeImage: "/certs/rhocp-badges-new.png",
             badgeId: "467d6229-c602-433c-835d-75939c941772",
-            description: "Validates OpenShift administration skills across deployment, networking, storage, security, and operations.",
+            description: "Validates OpenShift administration skills deployment, networking, storage, security, and operations.",
             skills: ["Kubernetes", "Containers", "Operators"],
             issueDate: "2026-01-07",
             expiration: "2029-01-07",
