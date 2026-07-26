@@ -77,6 +77,19 @@ export const ME = {
             expiration: "2029-01-07",
             verified: true,
         },
+        {
+            name: "Red Hat Satellite 6 Administration (RH403)",
+            shortName: "RH403",
+            issuer: "Red Hat",
+            credlyUrl: "https://www.credly.com/badges/4ffa8da6-d4db-4377-82e6-2427c7b8cf87",
+            badgeImage: "/certs/satellite-badges.png",
+            badgeId: "4ffa8da6-d4db-4377-82e6-2427c7b8cf87",
+            description: "Training for Red Hat Satellite 6 Administration Satellite deployment, lifecycle management, content management, and systems provisioning.",
+            skills: ["Red Hat Satellite", "Linux", "Systems Management", "RHEL"],
+            issueDate: "2025-01-09",
+            expiration: "",
+            verified: true,
+        },
     ],
 }
 
