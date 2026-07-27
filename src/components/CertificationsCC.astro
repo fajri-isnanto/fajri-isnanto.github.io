@@ -7,9 +7,8 @@ const { certifications } = ME;
 
 <div class="relative left-1/2 -translate-x-1/2 w-screen">
     <div class="max-w-[96rem] mx-auto px-4 mt-10">
-        <h2 class="text-3xl font-bold text-[#111827] mb-8">Certifications</h2>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {certifications.map((cert) => (
+        <div class="certifications-grid grid grid-cols-1 gap-6 mt-10">
+            {certifications.map((cert, i) => (
                 <CertCard
                     badgeImage={cert.badgeImage}
                     title={cert.name}
@@ -25,3 +24,16 @@ const { certifications } = ME;
         </div>
     </div>
 </div>
+
+<style is:global>
+    .certifications-grid {
+        grid-template-columns: 1fr;
+        max-width: 80rem;
+        margin: 0 auto;
+    }
+    @media (min-width: 1024px) {
+        .certifications-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>

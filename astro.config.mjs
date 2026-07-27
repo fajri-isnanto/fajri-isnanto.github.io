@@ -15,6 +15,7 @@ import pagefind from 'astro-pagefind';
 // https://astro.build/config
 export default defineConfig({
     site: 'https://fajri-isnanto.github.io',
+    server: { host: '192.168.1.126' },
     integrations: [
         mdx(), 
         react(), 
