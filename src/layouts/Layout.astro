@@ -106,21 +106,26 @@ const {
 </style>
 
 <script>
-  document.addEventListener('click', function(e) {
-    const img = e.target.closest('.prose img');
+  document.addEventListener('click', function(e: MouseEvent) {
+    const target = e.target as HTMLElement | null;
+    if (!target) return;
+
+    const img = target.closest('.prose img') as HTMLImageElement | null;
     if (!img) {
-      if (e.target.id === 'lightbox-overlay') {
-        document.getElementById('lightbox-overlay').classList.remove('active');
+      if (target.id === 'lightbox-overlay') {
+        document.getElementById('lightbox-overlay')?.classList.remove('active');
       }
       return;
     }
     const overlay = document.getElementById('lightbox-overlay');
-    const overlayImg = overlay.querySelector('img');
+    if (!overlay) return;
+    const overlayImg = overlay.querySelector('img') as HTMLImageElement | null;
+    if (!overlayImg) return;
     overlayImg.src = img.src;
     overlayImg.alt = img.alt;
     overlay.classList.add('active');
   });
-  document.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function(e: KeyboardEvent) {
     if (e.key === 'Escape') {
       document.getElementById('lightbox-overlay')?.classList.remove('active');
     }
