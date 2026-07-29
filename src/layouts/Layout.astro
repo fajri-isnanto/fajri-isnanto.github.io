@@ -106,30 +106,38 @@ const {
 </style>
 
 <script>
-  document.addEventListener('click', function(e: MouseEvent) {
-    const target = e.target as HTMLElement | null;
-    if (!target) return;
-
-    const img = target.closest('.prose img') as HTMLImageElement | null;
-    if (!img) {
-      if (target.id === 'lightbox-overlay') {
-        document.getElementById('lightbox-overlay')?.classList.remove('active');
-      }
-      return;
-    }
+// @ts-nocheck
+  function setupLightbox() {
     const overlay = document.getElementById('lightbox-overlay');
-    if (!overlay) return;
-    const overlayImg = overlay.querySelector('img') as HTMLImageElement | null;
+    if (!overlay || overlay.dataset.lightboxReady) return;
+    overlay.dataset.lightboxReady = 'true';
+
+    const overlayImg = overlay.querySelector('img');
     if (!overlayImg) return;
-    overlayImg.src = img.src;
-    overlayImg.alt = img.alt;
-    overlay.classList.add('active');
-  });
-  document.addEventListener('keydown', function(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      document.getElementById('lightbox-overlay')?.classList.remove('active');
-    }
-  });
+
+    overlay.addEventListener('click', function () {
+      overlay.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') overlay.classList.remove('active');
+    });
+
+    document.addEventListener('click', function (e) {
+      const target = e.target;
+      if (!target) return;
+
+      const img = target.closest('.prose img');
+      if (img) {
+        overlayImg.src = img.src;
+        overlayImg.alt = img.alt;
+        overlay.classList.add('active');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', setupLightbox);
+  document.addEventListener('astro:page-load', setupLightbox);
 </script>
 </body>
 </html>
