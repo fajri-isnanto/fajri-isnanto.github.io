@@ -1,0 +1,347 @@
+---
+draft: false
+title: Provisioning Kubernetes Cluster dengan Ansible
+tags:
+  - kubernetes-setup
+  - ansible
+  - kubeadm
+summary: Step-by-step provisioning Kubernetes cluster HA menggunakan Ansible automation, dari OS bare sampai 3 control-plane + 2 worker siap pakai.
+startDate: 2026-07-27
+endDate: 2026-07-27
+url: ""
+cover: './images/provisioning-k8s-ansible/cover.png'
+ogImage: './images/provisioning-k8s-ansible/cover.png'
+---
+
+## Daftar Isi
+
+- [1. Introduction — "Why Ansible?"](#1-introduction--why-ansible)
+- [2. Prasyarat](#2-prasyarat)
+- [3. Install & Konfigurasi Ansible](#3-install--konfigurasi-ansible)
+  - [3.1 Install Ansible di Bastion](#31-install-ansible-di-bastion)
+  - [3.2 Setup ansible.cfg](#32-setup-ansiblecfg)
+  - [3.3 Setup Inventory](#33-setup-inventory)
+- [4. Playbook 1 — Disable Swap](#4-playbook-1--disable-swap)
+- [5. Playbook 2 — Common Configuration](#5-playbook-2--common-configuration)
+- [6. Playbook 3 — Install Kubernetes Packages](#6-playbook-3--install-kubernetes-packages)
+- [7. Playbook 4 — Initialize First Control Plane](#7-playbook-4--initialize-first-control-plane)
+- [8. Playbook 5 — Join Additional Control Planes](#8-playbook-5--join-additional-control-planes)
+- [9. Playbook 6 — Join Worker Nodes](#9-playbook-6--join-worker-nodes)
+- [10. Verification & Troubleshooting](#10-verification--troubleshooting)
+- [11. Architecture Decision](#11-architecture-decision)
+- [12. What's Next](#12-whats-next)
+
+---
+
+## 1. Introduction — "Why Ansible?"
+
+Pada runbook kali ini saya menggunakan ansible sebagai tools untuk mempercepat proses instalasi dan setup kubernetes cluster. Ansible yang digunakan ada di versi 2.16 dan sudah terinstall di server bastion dengan IP 192.168.1.126, server yang sama digunakan sebagai haproxy.
+
+- **Kenapa ga manual SSH satu-satu?** (5 node x N step = Resiko Error lebih besar)
+  untuk setup kali ini bisa saja dilakukan manual dengan cara login satu persatu ke mesin master dan worker, namun hal ini rentan menimbulkan human error seperti typo dan akan ada waktu yang terbuang untuk troubleshoot. Dengan menggunakan ansible proses instalasi dan setup cluster kubernetes sepenuhnya akan dieksekusi dari satu server (Bastion Server) mulai dari melakukan setup OS, menginstall paket yang kubernetes dan setup Network untuk cluster.
+
+- **Kenapa Ansible?**
+  Ansible dipilih karena penggunaan yang cukup mudah dimana eksekusi job ditulis dengan format yaml yang mudah untuk dibaca, selain itu untuk mengeksekusi jobs di target server (cluster kubernetes nodes) tidak perlu menginstall agent (agentless) pada node target cukup inject ssh (ssh-copy-id) bastion node ke semua node cluster. Alasan lainnya ansible sudah cukup banyak di adopsi di lingkungan production.
+
+- **Konsep: control node vs managed node**
+  Pada kubernetes pada dasarnya server dikelompokkan menjadi dua bagian yaitu control-plane (master) sebagai otak dari cluster itu sendiri komponen utama cluster seperti kube-apiserver cluster, etcd, control-manager dan scheduler running diatas node master. umumnya master terdiri dari tiga buah server dengan tujuan untuk menciptakan mekanisme High Availibilty (HA) terhadap komponen utama cluster.
+  
+  Worker node sendiri adalah server yang digunakan untuk menjalankan aplikasi yang sudah dibuat oleh tim developer atau bisa disebut sebagai workload nodes. Semua traffik yang menuju aplikasi yang berjalan diatas cluster kubernetes nantinya akan diarahkan worker node. contohnya aplikasi aplikasi web server, mysql, messaging (kafka) dan aplikasi lainnya.
+
+- **Flow provisioning sekilas**
+  Gambaran singkat dari proses install dan setup cluster kubernetes kali ini akan menyesuaikan topologi sesuai gambar diatas.
+  Berikut big flow nya:
+  - Install haproxy sebagai load balancer cluster
+  - Menyiapkan vm bastion, master dan worker
+  - Install dan setup ansible sebagai tools provisioning cluster
+  - Menyiapkan ansible playbook
+  - Mengeksekusi ansible playbook
+  - Memverifikasi hasil eksekusi cluster kubernetes.
+
+---
+
+## 2. Prasyarat
+
+- VM Ubuntu 24.04 fresh install dengan total 6 vm yang akan digunakan sebagai 1 bastion, 3 master dan 2 worker.
+- SSH keypair server bastion, ssh ini akan kita tanamkan di semua node cluster kubernetes.
+- Setup /etc/hosts, dikarenakan tidak menggunakan DNS server maka diperlukan untuk melakukan manual inject ip dan domain di semua server cluster termasuk bastion. Berikut list binding IP yang digunakan.
+
+```hosts
+192.168.1.121  master1
+192.168.1.122  master2
+192.168.1.123  master3
+192.168.1.124  worker1
+192.168.1.125  worker2
+192.168.1.126  k8s-api.sky.com bastion
+```
+
+- Pastikan HAProxy sudah running dan ter setup sesuai kebutuhan, jika belum bisa setup terlebih dahulu [disini](/projects/install-setup-haproxy/).
+
+---
+
+## 3. Install & Konfigurasi Ansible
+
+### 3.1 Install Ansible di Bastion
+
+Login ke server bastion untuk menginstall ansible, gunakan command berikut untuk menginstall ansible dan pastikan server sudah memiliki akses internet.
+
+```bash
+apt install ansible
+```
+
+Verifikasi:
+
+```bash
+ansible --version
+```
+
+### 3.2 Setup ansible.cfg
+
+Buat folder baru untuk menyimpan playbook yaml, disini saya buat directory dengan nama ansible-automation dengan path /root/ansible-automation, dir ini nantinya akan menyimpan playbook dan inventory ansible. Buat file baru dengan nama ansible.cfg dengan value sebagai berikut:
+
+```ini
+[defaults]
+inventory = ./inventory.ini
+host_key_checking = false
+remote_user = root
+ask_pass = False
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+```
+
+### 3.3 Setup Inventory
+
+Buat file baru dengan nama inventory.ini dengan value sebagai berikut:
+
+```ini
+[masters]
+master1 ansible_host=192.168.1.121
+master2 ansible_host=192.168.1.122
+master3 ansible_host=192.168.1.123
+
+[workers]
+worker1 ansible_host=192.168.1.124
+worker2 ansible_host=192.168.1.125
+
+[kubernetes:children]
+masters
+workers
+
+[linux_servers:children]
+kubernetes
+
+[all:vars]
+ansible_user=root
+ansible_connection=ssh
+ansible_python_interpreter=/usr/bin/python3
+```
+
+File inventory.ini berisi daftar server yang akan menjadi target eksekusi ansible (server master & worker).
+
+Jika sudah download playbook di repository https://github.com/fajri-isnanto/ansible-playbook-provisioning.git bisa langsung clone di server bastion, tidak perlu credential khusus. Ada 6 file yaml yang merupakan playbook yang akan kita eksekusi untuk memulai proses install cluster.
+
+```yaml
+- 01-disableSwap.yaml
+- 01-common-config.yaml
+- 02-install-kubernetes.yaml
+- 03-init-control-plane.yml
+- 04-join-control-plane.yml
+- 05-join-workers.yml
+```
+
+Sampai tahap ini seharusnya persiapan sudah selesai, pastikan ssh publik bastion sudah tertanam di semua node cluster. Jika belum gunakan command ssh-copy-id untuk melakukannya.
+Kemudian karena pada skenario kali ini tidak menggunakan DNS Server maka diharuskan menambahkan record secara manual di semua node cluster dan bastion dengan menambahkan record berikut kedalam file /etc/hosts.
+
+```hosts
+192.168.1.121  master1
+192.168.1.122  master2
+192.168.1.123  master3
+192.168.1.124  worker1
+192.168.1.125  worker2
+192.168.1.126  k8s-api.sky.com bastion
+```
+
+Verifikasi semua cluster sudah bisa diakses dengan melakukan ping.
+
+```bash
+ansible -m ping all
+```
+
+![hasil ping](./images/provisioning-k8s-ansible/Pasted%20image%2020260727235536.png)
+
+---
+
+## 4. Playbook 1 — Disable Swap
+
+Step disable swap adalah langkah wajib untuk dilakukan sebelum menginstall paket kubernetes. Pada dasarnya swap pada sistem operasi linux digunakan sebagai memory cadangan jika memory fisik (actual RAM) sudah mencapai batas maksimal penggunaannya.
+
+Sebagai contoh jika ada server dengan ram actual 4 gb dan swap 1 gb jika ada sebuah proses yang membutuhkan memory 5 GB maka 1 GB akan diambil dari memory swap. FYI swap pake storage disk buat operasional nya dimana ada perbedaan besar di I/O kalo dibandingin sama kecepatan I/O RAM.
+
+Berikut beberapa efek di cluster kubernetes kalau swap ga di disable:
+
+- di kubernetes ada fitur buat limit resource (CPU & RAM) untuk setiap pod, kalau misal swap aktif cluster akan menganggap jumlah swap sebagai memory, hal ini buat sulit untuk melakukan set limit resource di pod.
+- pada proses scheduling pod dengan kondisi swap aktif kubernetes akan berasumsi bahwa swap sebagai memory fisik (RAM), hal ini bisa menimbulkan overcommit karena bisa aja kejadian assignment Memory ke pod melebihi batas asli kapasitas Memory RAM karena adanya sumbangan dari memory swap yang sifatnya fluktuatif.
+
+Baca lebih lengkap: [Why Kubernetes requires swap to be disabled](https://medium.com/@mayankarya837/why-kubernetes-requires-swap-to-be-disabled-a-deep-dive-for-devops-engineers-87215564beff)
+
+Login ke server bastion dan move ke dir ansible automation dan lanjut eksekusi playbook disable swap dan target dari eksekusi ini adalah semua node cluster.
+
+```bash
+ansible-playbook 01-disableSwap.yaml
+```
+
+Dari hasil eksekusi tersebut pastikan tidak ada error saat proses menjalankan playbook semua node target dengan kondisi finished. Verifikasi bahwa swap sudah off dengan command berikut, jika berhasil maka pada baris Swap size nya kan berubah jadi 0B (0 Byte).
+
+```bash
+ansible all -i inventory.ini -m shell -a "free -h"
+```
+
+![hasil swap](./images/provisioning-k8s-ansible/Pasted%20image%2020260728001620.png)
+
+Pada tahap ini proses disable swap sudah berhasil.
+
+---
+
+## 5. Playbook 2 — Common Configuration
+
+- Kernel modules: overlay + br_netfilter (container networking)
+- Sysctl: bridge-nf-call-iptables, ip_forward
+- containerd: install, SystemdCgroup=true
+  Ini termasuk parameter kritis karena jika Cgroup containerd bernilai false maka dia akan otomatis menggunakan default Cgroup System lama yaitu Cgroupfs sedangkan di versi kubernetes terbaru untuk cgroup sudah dihandle oleh systemd. Jadi kalau di set true containerd akan menggunakan system sebagai cgroup sesuai dengan cgroup yang digunakan oleh kubelet.
+  Cgroup sendiri merupakan module kernel di level OS yang digunakan untuk mengatur penggunaan Resource CPU dan memory dan isolasi pada container.
+- chrony / NTP: sync waktu antar node (etcd sensitive)
+- Timezone: Asia/Jakarta
+
+Pada playbook common configuration bertujuan untuk melakukan setup terhadap beberapa parameter di level OS, seperti mengaktifkan beberapa kernel modul seperti overlay dan br_netfilter, set cgroup containerd, set timezone menggunakan chrony dan perubahan konfigurasi untuk sysctl parameter yaitu bridge-nf-call-iptables, ip_forward.
+
+Eksekusi playbook 01-common-config.yaml dengan command berikut, target dari eksekusi ini adalah semua node cluster kubernetes.
+
+```bash
+ansible-playbook 01-common-config.yaml
+```
+
+Setelah selesai pastikan status eksekusi playbook finished tanpa adanya error.
+
+---
+
+## 6. Playbook 3 — Install Kubernetes Packages
+
+- GPG key + apt repository (v1.34)
+- kubeadm + kubelet + kubectl
+- Hold packages (jangan auto-upgrade tanpa sengaja)
+- Kenapa versi spesifik? (compatibility, reproducibility)
+
+Lanjut eksekusi playbook 02-install-kubernetes.yaml untuk menginstall paket yang dibutuhkan kubernetes yaitu kubeadm, kubelet, dan kubectl. Untuk target eksekusi ini ada semua node cluster. Eksekusi dengan command berikut.
+
+```bash
+ansible-playbook 02-install-kubernetes.yaml
+```
+
+Pastikan proses eksekusi playbook tidak menemui error, dan hasil hasil akhir state eksekusi finished. Lakukan verifikasi bahwa paket sudah terinstall, eksekusi command berikut dari bastion ini akan mengecek paket di semua node cluster.
+
+```bash
+ansible all -m shell -a "dpkg -l | egrep 'kubeadm|kubelet|kubectl'"
+```
+
+![hasil install k8s](./images/provisioning-k8s-ansible/Pasted%20image%2020260728003152.png)
+
+---
+
+## 7. Playbook 4 — Initialize First Control Plane
+
+Tujuan dari eksekusi playbook 03-init-control-plane.yml adalah melakukan inisiasi untuk cluster kubernetes khususnya untuk node masters, proses inisiasi ini akan dimulai dari node master1. Pada proses ini ada beberapa hal yang terjadi di background antara lain seperti membuat static pod manifest untuk pod yang menjadi komponen utama di control plane kube-apiserver, kube-controller-manager, kube-scheduler, dan etcd serta generate certificate untuk kebutuhan join master dan join worker yang akan dilakukan setelah step ini selesai.
+
+![init cp](./images/provisioning-k8s-ansible/Pasted%20image%2020260729104919.png)
+
+Ada beberapa parameter di file playbook yang menjadi matters salah satunya adalah parameter Vars yang berisikan spek versi kubernetes yang akan diinstall, IP ranges Network yang akan digunakan oleh Pod (10.244.0.0/16). IP ini nantinya akan di assign otomatis ketika new pod di deploy. Selalu ingat bahwa setiap traffic untuk kebutuhan manajemen cluster itu selalu lewat endpoint Control-plane (k8s-api.sky.com:6443). Untuk traffic ini nantinya akan masuk via HAproxy (192.168.1.126) untuk nantinya akan diteruskan ke backend service (Master Node) yang menjalankan service kube-apiserver, untuk step haproxy sudah kita setup sebelumnya.
+
+Target dari eksekusi playbook ini hanya **master1** dan akan menghasilkan output generated command yang akan kita gunakan nanti untuk join master2 dan master3 serta join Worker. Simpan generated command untuk di copy di playbook selanjutnya.
+
+**Informasi penting:** ketika melakukan init cluster di master1, certificate join memiliki masa expired selama 24 jam. Jadi kalau step join master dan worker dilanjut setelah 24 jam maka harus generate certificate baru. Better biar ga repot sekalian selesaikan sekali jalan.
+
+![join command](./images/provisioning-k8s-ansible/Pasted%20image%2020260729111450.png)
+
+Eksekusi playbook dengan command:
+
+```bash
+ansible-playbook 03-init-control-plane.yml
+```
+
+---
+
+## 8. Playbook 5 — Join Additional Control Planes
+
+Playbook 04-join-control-plane.yml akan menjalankan command untuk melakukan join cluster terhadap master2 dan master3. Edit file playbook dan copy generated command untuk master yang sudah disimpan sebelumnya. Target dari eksekusi ini adalah node master2 dan master3.
+
+Eksekusi playbook menggunakan command:
+
+```bash
+ansible-playbook 04-join-control-plane.yml
+```
+
+![join cp](./images/provisioning-k8s-ansible/Pasted%20image%2020260729125046.png)
+
+Playbook ini akan melakukan trigger master2 dan master3 untuk join cluster sebagai control-plane tambahan dimana cluster sebelumnya sudah berhasil diinisiasi di node master1. Setelah proses ini selesai maka sekarang cluster kubernetes sudah memiliki 3 control-plane yaitu master1, master2, dan master3 dimana pada setiap master menjalankan komponen utama cluster yaitu apiserver, scheduler, controller manager, dan etcd dan traffic yang diteruskan dari haproxy ke masters akan diterima oleh service apiserver dimana service ini jalan di setiap master di port 6443.
+
+---
+
+## 9. Playbook 6 — Join Worker Nodes
+
+Pada tahap sebelumnya kita sudah melakukan inisiasi pada master1 dan melakukan join cluster untuk master2 dan master3. Current condition sekarang adalah control-plane sudah berjalan dan terdiri dari 3 nodes master yang menjalankan service/komponen utama dari cluster kubernetes. Langkah selanjutnya adalah melakukan join worker dimana node worker ini nantinya akan digunakan untuk menjalankan aplikasi seperti aplikasi web, database, redis, dan aplikasi lainnya yang di develope oleh tim developer. Singkatnya di worker lah real workload akan berjalan, hal ini menjadi alasan kenapa spesifikasi server untuk worker lebih tinggi dibanding dengan spesifikasi server untuk master/control-plane.
+
+Edit file 05-join-workers.yml dan paste generated command untuk melakukan join worker, command yang sebelumnya sudah disimpan. Target dari eksekusi ini adalah worker1 dan worker2, pada ansible inventory worker ini sudah di grouping dengan nama workers.
+
+![join worker](./images/provisioning-k8s-ansible/Pasted%20image%2020260729131046.png)
+
+Eksekusi playbook 05-join-workers.yml dengan command:
+
+```bash
+ansible-playbook 05-join-workers.yml
+```
+
+Pastikan tidak ada error saat proses eksekusi playbook dan semua job berakhir dengan state finished. Berikut adalah tampilan list node yang sudah join, harusnya hasil yang ditampilkan NotReady di cluster saya status nya Ready karena sudah menginstall CNI, Installasi CNI akan dilakukan pada artikel lain.
+
+![node list](./images/provisioning-k8s-ansible/Pasted%20image%2020260729214634.png)
+
+Jika sudah maka cluster kubernetes saat ini memiliki 3 control-plane terdiri dari master1, master2, dan master3 serta 2 nodes worker yaitu worker1 dan worker2. Jika dilihat pada dashboard haproxy status backend service untuk service api-server sudah mulai aktif.
+
+![haproxy dashboard](./images/provisioning-k8s-ansible/Pasted%20image%2020260729131612.png)
+
+---
+
+## 10. Verification & Troubleshooting
+
+Eksekusi command `kubectl get nodes -o wide` dari bastion, output dari command tersebut akan menghasilkan list node master dan worker dengan status Not Ready. Hal ini dikarenakan CNI (Container Network Interface) belum terinstall. CNI sendiri berfungsi sebagai controller yang mengatur assignment IP terhadap pod dan services (clusterIP, Nodeport, LoadBalancer) agar pod dan service dapat saling berkomunikasi. Kita akan lanjut install CNI pada step selanjutnya.
+
+---
+
+## 11. Architecture Decision
+
+### Kenapa 3 control plane + 2 worker?
+
+Alasan memilih 3 control plane karena hal ini merepresentasikan kebanyakan jumlah master di level production. Dengan 3 Master kita mendapatkan High Availability untuk service yang berfungsi sebagai komponen utama cluster. Sehingga hal ini diharapkan mencegah cluster bermasalah jika komponen utama cluster yang running di salah satu master mati.
+2 worker dirasa sudah cukup untuk menjalankan workload aplikasi ditambah dengan spesifikasi worker yang lebih tinggi dibanding dengan spesifikasi master.
+
+### Kenapa k8s-api.sky.com via HAProxy (bukan langsung ke master1)?
+
+Sesuai dengan tujuan membangun Control-plane yang HA maka dibutuhkan service load balancer yang dapat menerima traffic yang menuju ke service api-server dan meneruskan traffic tersebut ke backend (Masters) dengan load yang dibagi merata ke semua node master dimana service api-server running.
+HAproxy termasuk service Load Balancer dan gratis yang dapat digunakan dan termasuk cukup mudah untuk di konfigurasi. Bisa saja endpoint k8s-api.sky.com langsung mengarah ke master1 namun dengan skema ini maka semua traffic yang menuju api-server akan hanya diarahkan ke node master1, masalah akan muncul ketika master1 mengalami malfungsi dan service api-server tidak bisa diakses maka keseluruhan cluster ikut tidak bisa diakses.
+Dengan menggunakan konsep HA kita dapat mencegah hal tersebut terjadi.
+
+### Kenapa tidak menggunakan DNS Server?
+
+Karena ini setup sederhana dan penggunaan dns server menjadi opsional di level ini maka untuk mekanisme resolving IP to Domain menggunakan cara manual. Untuk memenuhi kebutuhan tersebut sebelumnya kita sudah menambahkan record tambahan pada semua node cluster dan node bastion di file /etc/hosts dengan record sebagai berikut.
+
+![etc hosts](./images/provisioning-k8s-ansible/Pasted%20image%2020260729152009.png)
+
+Alasan lainnya adalah karena keterbatasan Resource pada Proxmox yang menjalankan VM cluster. Bisa saja pakai DNS server sendiri, biasanya BIND9 untuk skala homelab, dengan catatan A record dan PTR record-nya sudah dikonfigurasi supaya match satu sama lain. Namun jika tidak menggunakan dns server bisa manual menambahkan record di file /etc/hosts di semua node cluster.
+
+---
+
+## 12. What's Next
+
+Lanjut ke **Artikel 3: Install Cilium dengan Helm**.

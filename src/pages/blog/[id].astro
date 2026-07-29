@@ -33,7 +33,7 @@ const {Content} = await render(post);
         </div>
         <Image transition:name={`${post.id}-image`} class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700" src={cover.src}
                alt={cover.alt ?? title}/>
-        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert">
+        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-xl dark:prose-invert">
             <Content/>
         </article>
         <BackToTop />

@@ -35,13 +35,24 @@ const { Content } = await render(post);
         <p>
             {summary}
         </p>
-        <a href={url}>
-            Visit the project ↗
-        </a>
 
-        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-lg dark:prose-invert">
+        <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-xl dark:prose-invert">
             <Content/>
         </article>
         <BackToTop />
     </>
 </Layout>
+
+<style>
+    :global(#daftar-isi+ul),
+    :global(#daftar-isi+ul ul) {
+        list-style: none;
+        padding-left: 0;
+    }
+    :global(#daftar-isi+ul li) {
+        margin-bottom: 0.25rem;
+    }
+    :global(#daftar-isi+ul ul) {
+        padding-left: 1.25rem;
+    }
+</style>
