@@ -6,7 +6,7 @@ const { certifications } = ME;
 ---
 
 <div class="relative left-1/2 -translate-x-1/2 w-screen">
-    <div class="max-w-[96rem] mx-auto px-4 mt-10">
+    <div class="max-w-[105rem] mx-auto px-4 mt-10">
         <div class="certifications-grid grid grid-cols-1 gap-6 mt-10">
             {certifications.map((cert, i) => (
                 <CertCard
@@ -33,7 +33,7 @@ const { certifications } = ME;
     }
     @media (min-width: 1024px) {
         .certifications-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 520px);
         }
     }
 </style>
