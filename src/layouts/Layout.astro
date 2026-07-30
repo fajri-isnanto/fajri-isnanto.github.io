@@ -73,11 +73,13 @@ const {
 </div>
 
 <style is:global>
-  .prose img {
+  .prose img,
+  main > img {
     cursor: zoom-in;
     transition: opacity 0.2s;
   }
-  .prose img:hover {
+  .prose img:hover,
+  main > img:hover {
     opacity: 0.85;
   }
   #lightbox-overlay {
@@ -127,7 +129,7 @@ const {
       const target = e.target;
       if (!target) return;
 
-      const img = target.closest('.prose img');
+      const img = target.closest('.prose img') || target.closest('main > img');
       if (img) {
         overlayImg.src = img.src;
         overlayImg.alt = img.alt;
