@@ -1,8 +1,8 @@
-
 ---
 import { getCollection, render } from "astro:content";
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
+import PageV1Layout from "../../layouts/PageV1Layout.astro";
 import BackBtn from "@/components/BackBtn.astro";
 import BackToTop from "../../components/BackToTop.astro";
 
@@ -16,11 +16,46 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { title, summary, tags, cover, ogImage, url } = post.data;
-
+const { title, summary, tags, cover, ogImage, url, series, series_order } = post.data;
+const design = post.data.design || 'default';
 const { Content } = await render(post);
+
+// Build prev/next from series
+let prevPost = null;
+let nextPost = null;
+if (series && series_order) {
+    const seriesPosts = (await getCollection('projects'))
+        .filter(p => !p.data.draft && p.data.series === series)
+        .sort((a, b) => (a.data.series_order || 0) - (b.data.series_order || 0));
+
+    const currentIdx = seriesPosts.findIndex(p => p.id === post.id);
+    if (currentIdx > 0) {
+        const p = seriesPosts[currentIdx - 1];
+        prevPost = { title: p.data.title, id: p.id, order: p.data.series_order };
+    }
+    if (currentIdx < seriesPosts.length - 1) {
+        const p = seriesPosts[currentIdx + 1];
+        nextPost = { title: p.data.title, id: p.id, order: p.data.series_order };
+    }
+}
 ---
-<Layout title={title} description={summary} imageOg={ogImage} scrollSmooth={true} mainClass="mx-auto w-full max-w-5xl px-6 md:px-8">
+
+{design === 'pagev1' ? (
+  <PageV1Layout
+    title={title}
+    description={summary}
+    tags={tags || []}
+    date={new Date(post.data.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+    readingTime="5 min read"
+    series={series}
+    seriesOrder={series_order}
+    prevPost={prevPost}
+    nextPost={nextPost}
+  >
+    <Content />
+  </PageV1Layout>
+) : (
+  <Layout title={title} description={summary} imageOg={ogImage} scrollSmooth={true} mainClass="mx-auto w-full max-w-5xl px-6 md:px-8">
     <>
         <div class="flex justify-center mt-10">
             <BackBtn/>
@@ -28,20 +63,18 @@ const { Content } = await render(post);
         <div class="flex flex-col gap-6 justify-center items-center">
             <h1 class="text-3xl font-bold text-center">{title}</h1>
             <p class="text-sm text-n500 dark:text-primary-light ">
-                {tags.join(', ')}
+                {tags?.join(', ')}
             </p>
         </div>
         <Image transition:name={`${post.id}-image`} class="max-h-[520px] w-full rounded-lg bg-white object-contain dark:bg-n700" src={cover} alt={title}/>
-        <p>
-            {summary}
-        </p>
-
+        <p>{summary}</p>
         <article id="article" class="mx-auto mt-8 w-full max-w-5xl prose prose-xl dark:prose-invert">
             <Content/>
         </article>
         <BackToTop />
     </>
-</Layout>
+  </Layout>
+)}
 
 <style>
     :global(#daftar-isi+ul),

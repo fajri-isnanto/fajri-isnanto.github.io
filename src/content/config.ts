@@ -29,6 +29,9 @@ const projects = defineCollection({
     schema: ({ image }) => z.object({
         draft: z.boolean().optional(),
         draftReason: z.string().optional(),
+        design: z.string().optional(),
+        series: z.string().optional(),
+        series_order: z.number().optional(),
         title: z.string(),
         startDate: z.date(),
         endDate: z.date(),
