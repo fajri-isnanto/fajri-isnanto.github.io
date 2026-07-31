@@ -11,6 +11,7 @@ const posts = defineCollection({
         author: z.string().optional(),
         draft: z.boolean().optional(),
         draftReason: z.string().optional(),
+        design: z.string().optional(),
         publishDate: z.date(),
         updateDate: z.date().optional(),
         title: z.string(),

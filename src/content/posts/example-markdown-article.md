@@ -2,6 +2,7 @@
 author: Fajri Isnanto
 draft: true
 draftReason: Example/reference article, hide before production.
+design: pagev1
 publishDate: 2026-05-28
 title: Example Markdown Article for Technical Blog
 tags:

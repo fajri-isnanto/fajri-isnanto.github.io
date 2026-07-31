@@ -2,6 +2,7 @@
 author: Fajri Isnanto
 draft: false
 draftReason: Converted from DOCX, needs final review before publishing.
+design: pagev1
 publishDate: 2026-06-11
 title: Resource Definition in OpenShift
 tags:
