@@ -15,27 +15,7 @@ url: ""
 cover: './images/provisioning-k8s-ansible/cover.png'
 ogImage: './images/provisioning-k8s-ansible/cover.png'
 ---
-
-## Daftar Isi
-
-- [1. Introduction — "Why Ansible?"](#1-introduction--why-ansible)
-- [2. Prasyarat](#2-prasyarat)
-- [3. Install & Konfigurasi Ansible](#3-install--konfigurasi-ansible)
-  - [3.1 Install Ansible di Bastion](#31-install-ansible-di-bastion)
-  - [3.2 Setup ansible.cfg](#32-setup-ansiblecfg)
-  - [3.3 Setup Inventory](#33-setup-inventory)
-- [4. Playbook 1 — Disable Swap](#4-playbook-1--disable-swap)
-- [5. Playbook 2 — Common Configuration](#5-playbook-2--common-configuration)
-- [6. Playbook 3 — Install Kubernetes Packages](#6-playbook-3--install-kubernetes-packages)
-- [7. Playbook 4 — Initialize First Control Plane](#7-playbook-4--initialize-first-control-plane)
-- [8. Playbook 5 — Join Additional Control Planes](#8-playbook-5--join-additional-control-planes)
-- [9. Playbook 6 — Join Worker Nodes](#9-playbook-6--join-worker-nodes)
-- [10. Verification & Troubleshooting](#10-verification--troubleshooting)
-- [11. Architecture Decision](#11-architecture-decision)
-- [12. What's Next](#12-whats-next)
-
 ---
-
 ## 1. Introduction — "Why Ansible?"
 
 Pada runbook kali ini saya menggunakan ansible sebagai tools untuk mempercepat proses instalasi dan setup kubernetes cluster. Ansible yang digunakan ada di versi 2.16 dan sudah terinstall di server bastion dengan IP 192.168.1.126, server yang sama digunakan sebagai haproxy.

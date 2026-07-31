@@ -54,6 +54,10 @@ main {
     @apply rounded-2xl;
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 /* Icon Animations */
 .cv-btn:hover .animate-slide-right {
     animation: slide-right 0.5s cubic-bezier(1, -.43, .68, .57) infinite alternate both !important;
