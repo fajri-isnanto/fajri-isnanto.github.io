@@ -45,7 +45,7 @@ const {
   :root {
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Monaco, Consolas, monospace;
-    --content-w: 832px;
+    --content-w: 896px;
     --sidebar-w: 200px;
     --gap: 48px;
     --total-w: calc(var(--content-w) + var(--sidebar-w) + var(--gap));
@@ -142,14 +142,32 @@ const {
     font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9);
   }
 
+  /* ─── COVER IMAGE ─── */
+  .cover-wrap { max-width: var(--total-w); margin: 24px auto 0; padding: 0 32px; }
+  .cover-img { width: 76%; border-radius: var(--radius-lg); border: 1px solid var(--c-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: block; margin: 0 auto; }
+  body.dark .cover-img { border-color: var(--c-border); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+  /* ─── LIGHTBOX ─── */
+  .article-content img, .cover-img { cursor: zoom-in; transition: opacity 0.2s; }
+  .article-content img:hover, .cover-img:hover { opacity: 0.85; }
+  #lightbox-overlay { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; cursor: zoom-out; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  #lightbox-overlay.active { display: flex; }
+  #lightbox-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+
   /* ─── LAYOUT ─── */
-  .layout { max-width: var(--total-w); margin: 0 auto; padding: 48px 32px 80px; display: flex; gap: var(--gap); }
-  .sidebar { width: var(--sidebar-w); flex-shrink: 0; position: sticky; top: 32px; align-self: flex-start; }
+  .layout { max-width: var(--total-w); margin: 0 auto; margin-left: calc(50% - var(--total-w)/2 - 130px); padding: 5px 32px 80px; display: flex; gap: var(--gap); }
+@media (max-width: 1100px) { .layout { margin-left: auto; } }
+  .sidebar { width: var(--sidebar-w); flex-shrink: 0; position: sticky; top: 32px; align-self: flex-start; margin-top: 56px; background: #fff; border: 1.5px solid rgba(37,99,235,0.2); border-radius: var(--radius-lg); padding: 12px 11px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); transition: border-color 0.2s, box-shadow 0.2s; }
+  .sidebar:hover { border-color: rgba(37,99,235,0.4); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  body.dark .sidebar { background: #1E293B; border-color: rgba(96,165,250,0.2); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+  body.dark .sidebar:hover { border-color: rgba(96,165,250,0.4); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+  .sidebar-nav-wrap { max-height: calc(60vh - 40px); overflow-y: auto; scrollbar-width: thin; }
   .sidebar-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
   .sidebar-nav { list-style: none; }
-  .sidebar-nav li { margin-bottom: 2px; }
-  .sidebar-nav a { display: block; padding: 6px 12px; font-size: 13px; font-weight: 500; color: var(--c-muted); text-decoration: none; border-radius: 6px; transition: all 0.15s; border-left: 2px solid transparent; }
-  .sidebar-nav a:hover { color: var(--c-accent); background: #f0f5ff; border-left-color: var(--c-accent); }
+  .sidebar-nav li { margin-bottom: 0; }
+  .sidebar-nav a { display: block; padding: 4px 0 4px 12px; font-size: 13px; line-height: 1.4; font-weight: 400; color: var(--c-muted); text-decoration: none; border-radius: 0; transition: all 0.15s; border-left: none; }
+  .sidebar-nav a:hover { color: var(--c-accent); }
+  .sidebar-nav a.toc-active { color: var(--c-accent); font-weight: 500; border-left: 2px solid rgba(37,99,235,0.5); padding-left: 10px; }
 
   /* ─── DARK MODE (fixed top-right) ─── */
   .sticky-dark { position: fixed; top: 32px; right: 32px; z-index: 50; }
@@ -159,18 +177,18 @@ const {
   .glass-toggle { background: none; border: none; cursor: pointer; padding: 0; }
   .glass-track {
     display: flex; align-items: center;
-    width: 64px; height: 28px; padding: 3px;
+    width: 70px; height: 31px; padding: 3px;
     border-radius: 9999px;
-    background: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.6);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .glass-thumb {
     display: flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 50%;
+    width: 24px; height: 24px; border-radius: 50%;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -185,7 +203,7 @@ const {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   body.dark .glass-thumb {
-    transform: translateX(36px);
+    transform: translateX(40px);
     background: #334155;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     color: #93C5FD;
@@ -215,7 +233,7 @@ const {
   /* ─── CODE BLOCK ─── */
   .code-wrap { position: relative; margin: 28px 0; border-radius: var(--radius-lg); border: 1px solid var(--c-border); background: var(--c-code-bg); overflow: hidden; counter-reset: line; }
   .code-wrap pre { margin: 0; padding: 24px 24px 24px 60px; overflow-x: auto; background: transparent; }
-  .code-wrap pre code { font-size: 14px; line-height: 1.6; font-family: var(--font-mono); color: #1e293b; background: transparent; padding: 0; }
+  .code-wrap pre code { font-size: 14px; line-height: 1.6; font-family: var(--font-mono); color: var(--c-text); background: transparent; padding: 0; }
   .copy-btn { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: var(--radius-sm); background: #fff; border: 1px solid var(--c-border); color: var(--c-muted); font-size: 12px; font-weight: 500; font-family: var(--font-sans); cursor: pointer; opacity: 0; transition: opacity 0.15s; }
   .code-wrap:hover .copy-btn { opacity: 1; }
   .copy-btn:hover { border-color: var(--c-accent); color: var(--c-accent); }
@@ -287,6 +305,13 @@ const {
   </div>
 </header>
 
+<!-- ═══ COVER IMAGE ═══ -->
+{cover && (
+  <div class="cover-wrap">
+    <img src={typeof cover === 'string' ? cover : cover.src} alt={title} class="cover-img" />
+  </div>
+)}
+
 <!-- ═══ LAYOUT ═══ -->
 <div class="layout">
   <aside class="sidebar">
@@ -294,7 +319,7 @@ const {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       ON THIS PAGE
     </div>
-    <nav>
+    <nav class="sidebar-nav-wrap">
       <ul class="sidebar-nav" id="toc"></ul>
     </nav>
   </aside>
@@ -335,6 +360,9 @@ const {
 )}
 
 <div class="toast" id="toast">✅ Copied!</div>
+<div id="lightbox-overlay">
+  <img src="" alt="">
+</div>
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
@@ -367,10 +395,25 @@ const {
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = '#' + id;
-      a.textContent = h.textContent;
+      // Strip leading numbering (e.g. "1. ", "1 - ", "1.1 ")
+      a.textContent = h.textContent.replace(/^\d+[\.\-)\s]+\s*/, '');
       li.appendChild(a);
       toc.appendChild(li);
     });
+
+    // Active TOC highlight
+    const links = toc.querySelectorAll('a');
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        const id = entry.target.id;
+        const link = toc.querySelector('a[href="#' + id + '"]');
+        if (link && entry.isIntersecting) {
+          links.forEach(function(l) { l.classList.remove('toc-active'); });
+          link.classList.add('toc-active');
+        }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+    h2s.forEach(function(h) { observer.observe(h); });
   })();
 
   // Progress bar + back-to-top
@@ -395,6 +438,23 @@ const {
       wrap.appendChild(pre);
     });
   })();
+
+  // Lightbox
+  function setupLightbox() {
+    const overlay = document.getElementById('lightbox-overlay');
+    if (!overlay || overlay.dataset.lightboxReady) return;
+    overlay.dataset.lightboxReady = 'true';
+    const overlayImg = overlay.querySelector('img');
+    if (!overlayImg) return;
+    overlay.addEventListener('click', function() { overlay.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') overlay.classList.remove('active'); });
+    document.addEventListener('click', function(e) {
+      const img = e.target.closest('.article-content img') || e.target.closest('.cover-img');
+      if (img) { overlayImg.src = img.src; overlayImg.alt = img.alt || ''; overlay.classList.add('active'); }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', setupLightbox);
+  document.addEventListener('astro:page-load', setupLightbox);
 </script>
 </body>
 </html>

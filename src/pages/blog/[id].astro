@@ -28,6 +28,7 @@ const {Content} = await render(post);
     title={title}
     description={description}
     tags={tags || []}
+    cover={cover.src}
     date={publishDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
     readingTime="5 min read"
   >
