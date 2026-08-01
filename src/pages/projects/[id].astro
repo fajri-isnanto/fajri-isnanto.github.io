@@ -31,11 +31,11 @@ if (series && series_order) {
     const currentIdx = seriesPosts.findIndex(p => p.id === post.id);
     if (currentIdx > 0) {
         const p = seriesPosts[currentIdx - 1];
-        prevPost = { title: p.data.title, id: p.id, order: p.data.series_order };
+        prevPost = { title: p.data.title, id: p.id, order: p.data.series_order ?? 0 };
     }
     if (currentIdx < seriesPosts.length - 1) {
         const p = seriesPosts[currentIdx + 1];
-        nextPost = { title: p.data.title, id: p.id, order: p.data.series_order };
+        nextPost = { title: p.data.title, id: p.id, order: p.data.series_order ?? 0 };
     }
 }
 ---
