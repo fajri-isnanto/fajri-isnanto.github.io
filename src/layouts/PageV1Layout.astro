@@ -13,12 +13,13 @@ interface Props {
   seriesOrder?: number;
   prevPost?: { title: string; id: string; order: number } | null;
   nextPost?: { title: string; id: string; order: number } | null;
+  backUrl?: string;
 }
 
 const { 
   title, description = '', tags = [], 
   cover, ogImage, date = '', readingTime = '5 min read',
-  series = '', seriesOrder = 0, prevPost = null, nextPost = null
+  series = '', seriesOrder = 0, prevPost = null, nextPost = null, backUrl = '/projects/'
 } = Astro.props;
 ---
 
@@ -116,9 +117,19 @@ const {
   /* ─── HERO ─── */
   .hero {
     background: linear-gradient(90deg, var(--c-hero1), var(--c-hero2), var(--c-hero3));
-    padding: 80px 0 72px; color: #fff;
+    padding: 38px 0 72px; color: #fff;
   }
   .hero-inner { max-width: var(--total-w); margin: 0 auto; padding: 0 32px; }
+
+  /* Back arrow above tags */
+  .hero-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: rgba(255,255,255,0.7); text-decoration: none;
+    font-size: 14px; font-weight: 500; margin-bottom: 20px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .hero-back:hover { color: #fff; transform: translateX(-3px); }
+  .hero-back svg { flex-shrink: 0; }
   .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
   .hero-tag {
     display: inline-flex; padding: 4px 14px; border-radius: 9999px;
@@ -146,6 +157,7 @@ const {
   .cover-wrap { max-width: var(--total-w); margin: 24px auto 0; padding: 0 32px; }
   .cover-img { width: 76%; border-radius: var(--radius-lg); border: 1px solid var(--c-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: block; margin: 0 auto; }
   body.dark .cover-img { border-color: var(--c-border); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .cover-sep { max-width: var(--content-w); margin: 32px auto 0; border: none; height: 1px; background: var(--c-border); }
 
   /* ─── LIGHTBOX ─── */
   .article-content img, .cover-img { cursor: zoom-in; transition: opacity 0.2s; }
@@ -214,7 +226,7 @@ const {
   /* ─── ARTICLE ─── */
   .article-content { flex: 1; min-width: 0; max-width: var(--content-w); }
   .article-content h2 { font-size: 30px; font-weight: 700; line-height: 1.2; letter-spacing: -0.025em; color: var(--c-heading); margin-top: 48px; margin-bottom: 20px; }
-  .article-content h2:first-child { margin-top: 0; }
+  .article-content > :first-child { margin-top: 0; }
 
   /* Hide manual TOC (replaced by sidebar ON THIS PAGE) */
   .article-content #daftar-isi,
@@ -288,6 +300,10 @@ const {
 <!-- ═══ HERO ═══ -->
 <header class="hero" transition:animate="fade" transition:name="hero">
   <div class="hero-inner">
+    <a class="hero-back" href={backUrl}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
     <div class="hero-tags">
       {tags.map(tag => <span class="hero-tag">{tag}</span>)}
     </div>
@@ -311,6 +327,9 @@ const {
     <img src={typeof cover === 'string' ? cover : cover.src} alt={title} class="cover-img" />
   </div>
 )}
+
+<!-- ═══ COVER SEPARATOR ═══ -->
+{cover && <hr class="cover-sep" />}
 
 <!-- ═══ LAYOUT ═══ -->
 <div class="layout">
@@ -386,8 +405,10 @@ const {
   (function() { if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark'); })();
 
   // Auto-generate TOC from h2 elements
-  (function() {
+  function generateTOC() {
     const toc = document.getElementById('toc');
+    if (!toc) return;
+    toc.innerHTML = ''; // clear before rebuild (SPA navigations)
     const h2s = document.querySelectorAll('.article-content h2');
     h2s.forEach(function(h) {
       const id = h.id || h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -396,7 +417,7 @@ const {
       const a = document.createElement('a');
       a.href = '#' + id;
       // Strip leading numbering (e.g. "1. ", "1 - ", "1.1 ")
-      a.textContent = h.textContent.replace(/^\d+[\.\-)\s]+\s*/, '');
+      a.textContent = h.textContent.replace(/^\d+[\.\-\)\s]+\s*/, '');
       li.appendChild(a);
       toc.appendChild(li);
     });
@@ -414,7 +435,9 @@ const {
       });
     }, { rootMargin: '-80px 0px -70% 0px' });
     h2s.forEach(function(h) { observer.observe(h); });
-  })();
+  }
+  document.addEventListener('DOMContentLoaded', generateTOC);
+  document.addEventListener('astro:page-load', generateTOC);
 
   // Progress bar + back-to-top
   window.addEventListener('scroll', function() {
