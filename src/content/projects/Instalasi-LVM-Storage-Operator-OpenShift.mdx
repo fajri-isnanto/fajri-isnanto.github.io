@@ -1,0 +1,309 @@
+---
+draft: false
+design: pagev1
+series: openshift-runbook
+series_order: 1
+title: Instalasi & Konfigurasi LVM Storage Operator di OpenShift
+tags:
+  - openshift
+  - operator
+summary: Step-by-step instalasi LVM Storage Operator di OpenShift SNO 4.18 — menyediakan backend storage bertipe Block Disk dengan thin provisioning dan resize on-the-fly.
+startDate: 2026-08-06
+endDate: 2026-08-06
+url: ""
+cover: './images/lvm-storage-openshift/Pasted image 20260807222405.png'
+ogImage: './images/lvm-storage-openshift/Pasted image 20260807222405.png'
+---
+---
+
+## Introduction — "Kenapa LVM Storage?"
+
+Cluster OpenShift secara default tidak menyediakan storage backend yang siap pakai untuk PersistentVolumeClaim (PVC). Di production, kita butuh storage backend yang bisa melayani PVC dengan berbagai tipe — Filesystem maupun Block.
+
+Di lab saya, sebelumnya cluster OpenShift hanya menggunakan storage bertipe Filesystem (NFS) sebagai backend utama. Masalah muncul ketika workload tertentu seperti database (PostgreSQL, MySQL) atau aplikasi yang melakukan direct I/O memerlukan storage bertipe **Block Disk**. NFS tidak bisa memenuhi kebutuhan ini karena NFS beroperasi di layer Filesystem, bukan Block.
+
+**Kenapa Block?**
+- Database umumnya melakukan penulisan langsung ke block device untuk performa (direct I/O, bypass OS cache).
+- NFS menambahkan overhead network + filesystem layer yang bisa memperlambat operasi I/O.
+- Beberapa aplikasi secara eksplisit mensyaratkan volume bertipe `Block` (bukan `Filesystem`).
+
+**Kenapa LVM Storage Operator?**
+- Tidak memerlukan provisioning VM atau node baru — cukup tambahkan disk kosong ke worker node yang sudah ada.
+- PVC bisa di-resize tanpa downtime (`allowVolumeExpansion: true`).
+- Dikelola langsung oleh Red Hat sebagai Operator di OperatorHub — lifecycle managed.
+- Cocok untuk environment dengan keterbatasan resource (seperti lab SNO saya).
+
+**Alternatif: OpenShift Data Foundation (ODF)**
+ODF adalah solusi storage enterprise dari Red Hat, tapi membutuhkan minimal 3 node worker dengan spesifikasi storage yang dedicated. Di lab SNO (Single Node OpenShift) ini, ODF tidak feasible karena keterbatasan resource. LVM Storage Operator adalah pilihan yang pas.
+
+---
+
+## Environment Overview
+
+Berikut ringkasan environment lab pada saat pengerjaan:
+
+| Komponen           | Detail                            |
+| ------------------ | --------------------------------- |
+| Cluster            | OpenShift Single Node (SNO)       |
+| Versi OCP          | 4.18                              |
+| Node               | bc-24-11-42-89-79 (192.168.1.249) |
+| Bastion            | 192.168.1.127                     |
+| Disk tambahan      | /dev/sdb (15 GB)                  |
+| Total raw capacity | 15 GB                             |
+
+---
+
+## Prerequisites — Pengecekan Ketersediaan Disk
+
+Sebelum instalasi operator, pastikan disk kosong (raw disk, **tidak berpartisi dan tidak terformat**) tersedia di worker node target.
+
+### Cek disk dari node
+
+1. Login ke OpenShift Console.
+2. Navigator → **Compute** → **Nodes**.
+3. Pilih node target, buka tab **Terminal**.
+4. Eksekusi command `lsblk` untuk melihat disk yang akan dijadikan backend block disk (`/dev/sdb`).
+
+![lsblk output](./images/lvm-storage-openshift/Pasted%20image%2020260807221836.png)
+
+**Kenapa disk harus kosong (tanpa partisi/format)?**
+LVM Operator akan mengambil alih full disk untuk membuat Physical Volume (PV) dan Volume Group (VG). Jika disk sudah ada partisi, operator akan gagal melakukan klaim.
+
+---
+
+## Instalasi LVM Storage Operator
+
+### Via OperatorHub (OpenShift Console)
+
+1. Login ke OpenShift Console.
+2. Navigator → **OperatorHub**.
+3. Cari **LVM Storage**.
+4. Pilih channel **stable-4.18**, versi **4.18.4** (disediakan oleh Red Hat).
+5. Klik **Install** → namespace: `openshift-storage` → **Install**.
+
+![OperatorHub LVM Storage](./images/lvm-storage-openshift/Pasted%20image%2020260807215822.png)
+
+**Kenapa namespace `openshift-storage`?**
+Ini adalah namespace default yang direkomendasikan Red Hat untuk operator storage. Menggunakan namespace lain bisa menyebabkan masalah RBAC dan monitoring.
+
+### Verifikasi Operator Pod
+
+![Operator installed](./images/lvm-storage-openshift/Pasted%20image%2020260807221539.png)
+
+![Operator pod running](./images/lvm-storage-openshift/Pasted%20image%2020260807221556.png)
+
+Pastikan operator pod sudah terinstal dan berstatus running. Untuk pengecekan lebih dalam, pastikan log container pod sudah muncul. Hal ini memastikan bahwa container benar-benar berjalan, karena dalam beberapa kasus pod operator sudah berstatus running tapi log container masih stuck/error.
+
+Verifikasi via CLI:
+
+```bash
+oc get pods -n openshift-storage -l app=lvm-operator
+```
+
+---
+
+## Konfigurasi LVMCluster
+
+Setelah operator terinstal, langkah selanjutnya adalah membuat Custom Resource (CR) `LVMCluster`. CR ini yang akan memberi tahu operator:
+- Node mana yang jadi target LVM.
+- Disk mana yang digunakan.
+- Bagaimana thin pool dikonfigurasi.
+
+### Membuat CR LVMCluster
+
+```yaml
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvmcluster
+  namespace: openshift-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: lvms-local-block
+      default: true
+      vgName: lvms-local-block
+      nodeSelector:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - bc-24-11-42-89-79
+      deviceSelector:
+        paths:
+        - /dev/sdb
+      thinPoolConfig:
+        name: thin-pool-1
+        sizePercent: 90
+        overprovisionRatio: 10
+```
+
+**Penjelasan parameter:**
+
+| Parameter                           | Nilai             | Kenapa?                                                                                              |
+| ----------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `deviceSelector.paths`              | `/dev/sdb`        | Disk kosong yang akan dikelola LVM                                                                   |
+| `thinPoolConfig.sizePercent`        | 90                | 90% dari total kapasitas untuk thin pool, 10% free space untuk metadata & operasional VG             |
+| `thinPoolConfig.overprovisionRatio` | 10                | Mengizinkan overprovisioning 10x — PVC 100 GB hanya consume ~10 GB fisik sampai benar-benar terpakai |
+| `nodeSelector`                      | bc-24-11-42-89-79 | Di SNO hanya ada 1 node, jadi cukup deklarasi node tunggal                                           |
+
+**Kenapa thin provisioning?**
+Tanpa thin provisioning, setiap PVC langsung mengonsumsi kapasitas penuh dari VG meskipun data belum terisi. Dengan thin provisioning + overprovision, kita bisa membuat PVC dengan total kapasitas deklarasi lebih besar dari kapasitas fisik (di-overprovision), dan kapasitas fisik hanya terpakai saat data benar-benar ditulis. Ini menghemat storage secara signifikan.
+
+> **⚠️ Peringatan overprovision:** Dengan `overprovisionRatio: 10`, total kapasitas PVC yang bisa dibuat adalah 10x kapasitas fisik. Jika semua PVC tiba-tiba terisi penuh, disk fisik bisa habis dan **semua PVC akan masuk mode read-only**. Pantau usage disk secara berkala.
+
+Masuk ke Operator LVM Storage, lalu pada bagian **API Resource** klik **Create** untuk membuat CR LVMCluster. Paste file YAML yang sudah disiapkan, lalu **Create**.
+
+![Create LVMCluster](./images/lvm-storage-openshift/Pasted%20image%2020260807222231.png)
+
+![YAML editor](./images/lvm-storage-openshift/Pasted%20image%2020260807222254.png)
+
+![LVMCluster created](./images/lvm-storage-openshift/Pasted%20image%2020260807222405.png)
+
+### Verifikasi LVMCluster
+
+Verifikasi dilakukan dengan mengecek status pod `vg-manager` yang diharapkan berstatus running dan log container sudah berjalan.
+
+![vg-manager pod](./images/lvm-storage-openshift/Pasted%20image%2020260807222627.png)
+
+### Verifikasi Volume Group (VG) di OS
+
+Pengecekan juga dilakukan di level OS guna memastikan bahwa VG sudah berhasil dibuat:
+
+```bash
+vgs
+lvs
+```
+
+![VG di OS](./images/lvm-storage-openshift/Pasted%20image%2020260807222823.png)
+
+### Verifikasi StorageClass
+
+Pada saat membuat CR LVMCluster, StorageClass baru akan otomatis dibuat. Pada case kali ini StorageClass-nya adalah `lvms-lvms-local-block`. Naming convention-nya: `lvms-<deviceClassName>`.
+
+![StorageClass lvms](./images/lvm-storage-openshift/Pasted%20image%2020260807222940.png)
+
+**Catatan penting**: `volumeBindingMode: WaitForFirstConsumer` artinya PVC yang dibuat akan tetap `Pending` sampai ada Pod yang menggunakannya. Ini adalah perilaku normal dan disengaja.
+
+### Dampak WaitForFirstConsumer di Multi-Node
+
+Pada penerapan di lingkungan production, node target LVM biasanya diarahkan ke beberapa worker. Ini memberikan behavior yang berbeda pada proses scheduling pod.
+
+Misalnya dalam sebuah cluster ada 5 worker, kemudian worker1, worker2, dan worker3 dijadikan target LVM Storage. Jika ada pod yang akan menggunakan PVC dari LVM Storage, pod tersebut **hanya akan dijadwalkan oleh scheduler untuk running di node worker1/worker2/worker3**. Pod tidak bisa running di worker4 atau worker5 karena PVC hanya tersedia di node target LVM.
+
+Ini merupakan salah satu batasan dari LVM Storage Operator yang perlu diperhatikan saat mendesain topology cluster production.
+
+---
+
+## Verifikasi & Pengujian PVC
+
+### Membuat PVC Block
+
+Pengujian selanjutnya adalah membuat sample PVC yang menggunakan StorageClass `lvms-lvms-local-block` yang nantinya akan dikonsumsi (binding) dengan Pod.
+
+Buat PVC dengan nama `test-pvc-lvms`:
+
+![Create PVC](./images/lvm-storage-openshift/Pasted%20image%2020260807223759.png)
+
+![PVC form](./images/lvm-storage-openshift/Pasted%20image%2020260807223844.png)
+
+![PVC Pending](./images/lvm-storage-openshift/Pasted%20image%2020260807223908.png)
+
+**Kenapa status Pending?** Karena `volumeBindingMode: WaitForFirstConsumer`. PVC akan tetap Pending sampai ada Pod yang menggunakannya.
+
+### Membuat Pod Consumer
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pvc-pod
+  namespace: openshift-storage
+spec:
+  containers:
+  - name: test
+    image: registry.access.redhat.com/ubi9/ubi-minimal
+    command: ["sleep", "3600"]
+    volumeDevices:
+    - devicePath: "/dev/xvda"
+      name: test-vol
+  volumes:
+  - name: test-vol
+    persistentVolumeClaim:
+      claimName: test-pvc-lvms
+```
+
+Buat pod baru dengan nama `test-pvc-pod`. Pod ini akan melakukan binding dengan PVC yang baru saja dibuat dan status PVC akan berubah dari `Pending` menjadi `Bound`.
+
+![Create Pod](./images/lvm-storage-openshift/Pasted%20image%2020260807224754.png)
+
+![PVC Bound](./images/lvm-storage-openshift/Pasted%20image%2020260807225231.png)
+
+**Kenapa `volumeDevices` bukan `volumeMounts`?**
+- `volumeDevices` → untuk PVC bertipe **Block** (raw block device).
+- `volumeMounts` → untuk PVC bertipe **Filesystem** (mount ke path directory).
+
+### Verifikasi di Level OS
+
+Pengecekan juga dilakukan di level OS. Karena sebelumnya Volume Group sudah berhasil dibuat, maka setelah status PVC menjadi Bound, Logical Volume baru akan otomatis terbentuk di node target LVM.
+
+![LV 4GB di OS](./images/lvm-storage-openshift/Pasted%20image%2020260807225451.png)
+
+Logical volume baru sebesar 4 GB sudah terbentuk sesuai dengan PVC.
+
+### Resize PVC (On-the-fly, Tanpa Downtime)
+
+Pengecekan selanjutnya adalah melakukan resize PVC dari ukuran 4GB menjadi 6GB.
+
+```bash
+oc patch pvc test-pvc-lvms -n openshift-storage \
+  -p '{"spec":{"resources":{"requests":{"storage":"6Gi"}}}}'
+```
+
+Atau via Console: klik tab **Action** → **Edit PVC** → ubah value `size` ke 6GB.
+
+![Edit PVC](./images/lvm-storage-openshift/Pasted%20image%2020260807230155.png)
+
+![Resize form](./images/lvm-storage-openshift/Pasted%20image%2020260807230224.png)
+
+![PVC 6GB](./images/lvm-storage-openshift/Pasted%20image%2020260807230354.png)
+
+LV sekarang menunjukkan kapasitas 6 GB. **Pod tidak perlu direstart** — resize terjadi secara on the fly.
+
+Cek juga di level OS, pastikan Logical Volume (LV) juga sudah berubah ukurannya.
+
+![LV 6GB di OS](./images/lvm-storage-openshift/Pasted%20image%2020260807230537.png)
+
+---
+
+## Architecture Decision
+
+### Kenapa LVM Storage Operator, bukan ODF?
+
+| Kriteria | LVM Storage Operator | OpenShift Data Foundation (ODF) |
+|---|---|---|
+| Minimum node | 1 (SNO support) | 3 worker node |
+| Resource tambahan | Tidak ada (pakai disk existing) | VM/disk dedicated untuk OSD |
+| Kompleksitas | Rendah | Tinggi (Ceph cluster) |
+| Fitur | Block, thin provisioning, resize | Block, File, Object, replication, erasure coding |
+| Cocok untuk | Lab, edge, small-scale | Production multi-node |
+
+Di lab SNO, ODF tidak feasible karena butuh minimal 3 node. LVM Storage Operator adalah pilihan tepat.
+
+### Dampak Arsitektur yang Perlu Diperhatikan
+
+1. **StorageClass baru**: Semua PVC Block harus menggunakan StorageClass `lvms-lvms-local-block`.
+2. **Node affinity implisit**: Pod yang menggunakan PVC dari LVM Storage akan dijadwalkan untuk running di node yang sama dengan lokasi PVC (di SNO ini tidak menjadi masalah karena hanya 1 node).
+3. **WaitForFirstConsumer**: Selalu ingat bahwa PVC baru akan tetap Pending sampai ada Pod yang menggunakannya.
+4. **Overprovision risk**: Dengan `overprovisionRatio: 10`, pantau usage disk fisik secara berkala untuk mencegah thin pool kehabisan space.
+
+---
+
+## Kesimpulan
+
+Implementasi LVM Storage Operator pada OpenShift SNO berhasil:
+- Menyediakan backend storage bertipe **Block Disk** melalui StorageClass `lvms-lvms-local-block`.
+- PVC dapat di-resize secara on-the-fly tanpa downtime.
+- Tidak memerlukan resource tambahan — cukup memanfaatkan disk kosong di node existing.
+- Dilengkapi thin provisioning dengan overprovisioning untuk efisiensi storage.
