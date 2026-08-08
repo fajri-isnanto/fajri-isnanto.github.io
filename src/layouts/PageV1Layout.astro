@@ -163,8 +163,7 @@ const {
   body.dark .cover-img { border-color: var(--c-border); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 
   /* ─── LIGHTBOX ─── */
-  .article-content img, .cover-img { cursor: zoom-in; transition: opacity 0.2s; }
-  .article-content img:hover, .cover-img:hover { opacity: 0.85; }
+  .article-content img, .cover-img { cursor: zoom-in; }
   #lightbox-overlay { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; cursor: zoom-out; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
   #lightbox-overlay.active { display: flex; }
   #lightbox-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
