@@ -164,9 +164,9 @@ const {
 
   /* ─── LIGHTBOX ─── */
   .article-content img, .cover-img { cursor: zoom-in; }
-  #lightbox-overlay { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; cursor: zoom-out; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-  #lightbox-overlay.active { display: flex; }
-  #lightbox-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+  #lightbox-overlay-pv1 { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; cursor: zoom-out; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  #lightbox-overlay-pv1.active { display: flex; }
+  #lightbox-overlay-pv1 img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
 
   /* ─── LAYOUT ─── */
   .layout { max-width: var(--total-w); margin: 0 auto; margin-left: calc(50% - var(--total-w)/2 - 130px); padding: 5px 32px 80px; display: flex; gap: var(--gap); }
@@ -380,7 +380,7 @@ const {
 )}
 
 <div class="toast" id="toast">✅ Copied!</div>
-<div id="lightbox-overlay">
+<div id="lightbox-overlay-pv1">
   <img src="" alt="">
 </div>
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
@@ -465,7 +465,7 @@ const {
 
   // Lightbox
   function setupLightbox() {
-    const overlay = document.getElementById('lightbox-overlay');
+    const overlay = document.getElementById('lightbox-overlay-pv1');
     if (!overlay || overlay.dataset.lightboxReady) return;
     overlay.dataset.lightboxReady = 'true';
     const overlayImg = overlay.querySelector('img');
